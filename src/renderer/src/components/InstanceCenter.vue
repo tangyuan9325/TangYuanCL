@@ -60,6 +60,7 @@ onUnmounted(()=>{document.removeEventListener('keydown',key,true);previousFocus?
       <div class="ic-summary" data-ui="instance-center:overview"><div><h3>你的游戏，独立管理</h3><p class="ic-path">{{overview?.directory}}</p></div><button class="btn btn-ghost" @click="perform(()=>invoke(IPC.centerFile,target,'directory',''))">打开目录</button></div>
       <div class="ic-grid"><button class="ic-card" @click="navigate('mods')"><strong>模组管理 →</strong><span>版本、启停与兼容性</span></button><button class="ic-card" @click="navigate('packs')"><strong>资源包 →</strong><span>管理材质与界面资源</span></button><button class="ic-card" @click="navigate('shaders')"><strong>光影包 →</strong><span>管理游戏光影</span></button><button class="ic-card" @click="navigate('game')"><strong>版本设置 →</strong><span>Java、窗口与隔离设置</span></button></div>
       <div class="ic-card"><h3>复制一个独立实例</h3><p>保留模组、配置与锁定状态，原实例保持完整。可在副本里尝试新的模组组合。</p><button class="btn btn-gold" :disabled="busy||overview?.running" @click="name=target.id+'-副本';form='clone'">复制实例</button></div>
+      <div class="ic-card" data-ui="instance-center:modpack-export"><h3>导出为整合包</h3><p>把模组、配置与脚本打包成 .mrpack，可分享给他人，也能被本启动器重新导入。存档、截图与个人设置不会包含在内。</p><button class="btn btn-gold" :disabled="busy||overview?.running" @click="perform(()=>op({kind:'modpackExport'}))">导出整合包</button></div>
      </template>
      <template v-else-if="tab==='worlds'">
       <div class="ic-tools"><input v-model="search" class="input" placeholder="搜索存档名称" aria-label="搜索存档"/><button class="btn btn-gold" :disabled="busy||overview?.running" @click="prepareImport">导入存档</button></div>

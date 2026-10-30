@@ -892,6 +892,14 @@ function modpackInfo(zip: AdmZip, filePath: string): ModpackInfo {
   const parsed = detected.format === 'mrpack' ? parseMrpack(zip) : parseCurseForge(zip)
   const { meta } = parsed
   const files = parsed.files
+  // 随包分发的文件数与需要下载的清单文件数是两回事：全量包（overrides 携带内容）
+  // 的清单 files 可以为空，只报 fileCount 会让用户以为包是空的。
+  const overrideCount = zip.getEntries().filter((entry) => {
+    if (entry.isDirectory) return false
+    const name = normEntry(entry.entryName)
+    return (!!meta.overridesPrefix && name.startsWith(`${meta.overridesPrefix}/`)) ||
+      (!!meta.clientOverridesPrefix && name.startsWith(`${meta.clientOverridesPrefix}/`))
+  }).length
   return {
     format: detected.format,
     innerName: meta.name,
@@ -901,6 +909,7 @@ function modpackInfo(zip: AdmZip, filePath: string): ModpackInfo {
     loader: meta.loader,
     loaderVersion: meta.loaderVersion,
     fileCount: files.length,
+    overrideCount,
     downloadBytes:
       parsed.kind === 'mrpack' ? parsed.files.reduce((sum, file) => sum + file.size, 0) : 0,
     hasOverrides: !!meta.overridesPrefix && zip.getEntries().some((entry) => normEntry(entry.entryName).startsWith(`${meta.overridesPrefix}/`)),

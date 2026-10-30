@@ -7,6 +7,7 @@ import * as center from './instanceCenter'
 import { instanceBackups } from './changeProtection'
 import { safePath, exportTreeZip, type BackupProgress } from './backupStore'
 import { diagnoseInstance, repairInstanceFiles } from './instanceDiagnostics'
+import { exportInstanceModpack } from './modpackExport'
 import { registerTask, finishTask, isCancelError, waitIfTaskPaused } from './tasks'
 import { planMissingDependencies, applyMissingDependencies } from './modManagement'
 export function registerInstanceCenterIpc(getWin:()=>BrowserWindow|null){
@@ -39,6 +40,13 @@ export function registerInstanceCenterIpc(getWin:()=>BrowserWindow|null){
     return task('恢复实例',(s,p)=>center.cloneInstance(c.target,o.name||'',o.destinationFolder||c.folder,true,true,s,p,o.backupId))
    }
    case 'repair':return task('修复运行文件',(s,p)=>repairInstanceFiles(o.planId||'',s,p))
+   case 'modpackExport':{
+    await center.assertInstanceIdle(c.dir)
+    const picked=await dialog.showSaveDialog({title:'导出整合包',defaultPath:`${c.target.id}.mrpack`,filters:[{name:'Modrinth 整合包',extensions:['mrpack']}]})
+    if(picked.canceled||!picked.filePath)return null
+    if(fs.existsSync(picked.filePath))throw new Error('导出文件已存在，请选择新文件名')
+    return task('导出整合包',(s,p)=>exportInstanceModpack(c.target,picked.filePath!,s,p))
+   }
    case 'worldExport':{
     center.validateInstanceName(o.world||'');await center.assertInstanceIdle(c.dir)
     const source=await safePath(c.dir,'saves/'+o.world),picked=await dialog.showSaveDialog({title:'导出存档',defaultPath:o.world+'.zip',filters:[{name:'ZIP',extensions:['zip']}]})

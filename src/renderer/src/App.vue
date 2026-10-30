@@ -1638,6 +1638,7 @@ onUnmounted(() => {
           </div>
           <p data-ui="App:94bfb09f6b96" class="mp-summary">
             {{ mpModal.info.fileCount }} 个清单文件 · {{ fmtPackBytes(mpModal.info.downloadBytes) }}
+            <span data-ui="App:5f1ac07d3e62" v-if="mpModal.info.overrideCount"> · {{ mpModal.info.overrideCount }} 个内置文件</span>
             <span data-ui="App:b63322e9dda7" v-if="mpModal.info.hasOverrides"> · overrides</span>
             <span data-ui="App:99b02870d974" v-if="mpModal.info.hasClientOverrides"> · client-overrides</span>
           </p>

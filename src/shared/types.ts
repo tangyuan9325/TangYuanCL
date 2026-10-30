@@ -895,6 +895,8 @@ export interface ModpackInfo {
   loader?: LoaderName
   loaderVersion?: string
   fileCount: number
+  /** 包内 overrides/client-overrides 携带的文件数（随包分发，无需下载） */
+  overrideCount?: number
   downloadBytes: number
   hasOverrides: boolean
   hasClientOverrides: boolean

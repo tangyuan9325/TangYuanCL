@@ -16,7 +16,7 @@ export interface InstanceOverview {
   mcVersion: string; loader?: string; running: boolean; roots: string[]
 }
 export interface InstanceOperation {
-  kind: 'backup' | 'clone' | 'restore' | 'worldExport' | 'repair'
+  kind: 'backup' | 'clone' | 'restore' | 'worldExport' | 'repair' | 'modpackExport'
   target: InstanceTarget; name?: string; destinationFolder?: string
   saves?: boolean; screenshots?: boolean; world?: string; backupId?: string; overwrite?: boolean
 }
