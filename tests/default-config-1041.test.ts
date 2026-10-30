@@ -17,7 +17,7 @@ async function runtime(t: any, env: Record<string, string> = {}) {
   const fakeProcess = { ...process, env: { ...process.env, ...env } }
   new Function('require','module','exports','process',await code)(
     (name: string) => name === 'electron' ? { app: { isPackaged: true, getPath: () => root, getVersion: () => '1.0.41', getName: () => 'test' } }
-      : name === 'undici' ? { ...require(name), fetch: async (url: string) => { requested.push(String(url)); return Response.json({ tag_name: 'v1.0.30', assets: [{ name: 'KAMUCL-1.0.30.exe', size: 123, browser_download_url: 'https://github.com/kamubaba-i/KAMUCL/releases/download/v1.0.30/KAMUCL-1.0.30.exe' }] }) } }
+      : name === 'undici' ? { ...require(name), fetch: async (url: string) => { requested.push(String(url)); return Response.json({ tag_name: 'v1.0.30', assets: [{ name: 'TangYuanCL-1.0.30.exe', size: 123, browser_download_url: 'https://github.com/tangyuan9325/TangYuanCL/releases/download/v1.0.30/TangYuanCL-1.0.30.exe' }] }) } }
       : require(name), mod, mod.exports, fakeProcess)
   return { root, api: mod.exports, requested }
 }
@@ -145,14 +145,14 @@ test('unassigned key persists and syncs as unknown while other settings survive'
 test('packaged updates ignore test overrides and reject local v99 pending/cache pollution', async t => {
   const { root, api, requested } = await runtime(t, { KAMUCL_USERDATA_DIR: 'unused-test-dir', KAMUCL_UPDATE_API_BASE: 'http://127.0.0.1:8310', KAMUCL_VERSION_OVERRIDE: '99.0.0' })
   assert.equal(api.currentVersion(), '1.0.41')
-  const file = path.join(root, 'KAMUCL-99.0.0.exe'); fs.writeFileSync(file, 'fixture')
-  const release = { version: '99.0.0', assetName: path.basename(file), assetUrl: 'http://127.0.0.1:8310/download/KAMUCL-99.0.0.exe', assetSize: 7 }
+  const file = path.join(root, 'TangYuanCL-99.0.0.exe'); fs.writeFileSync(file, 'fixture')
+  const release = { version: '99.0.0', assetName: path.basename(file), assetUrl: 'http://127.0.0.1:8310/download/TangYuanCL-99.0.0.exe', assetSize: 7 }
   fs.writeFileSync(path.join(root, 'pending-update.json'), JSON.stringify({ release, file }))
   assert.equal(api.getPendingUpdate(), null); assert(fs.existsSync(file)); assert(fs.readdirSync(root).some(f => f.startsWith('pending-update.json.rejected-')))
   fs.writeFileSync(path.join(root, 'update-check-cache.json'), JSON.stringify({ checkedAt: Date.now(), latest: release }))
   const checked = await api.checkLatest(false)
   assert.equal(checked.hasUpdate, false); assert.equal(checked.release.version, '1.0.30'); assert(requested.every(u => u.startsWith('https://api.github.com/')))
-  const official = { ...release, version: '1.0.42', assetName: 'KAMUCL-1.0.42.exe', assetUrl: 'https://github.com/kamubaba-i/KAMUCL/releases/download/v1.0.42/KAMUCL-1.0.42.exe' }
+  const official = { ...release, version: '1.0.42', assetName: 'TangYuanCL-1.0.42.exe', assetUrl: 'https://github.com/tangyuan9325/TangYuanCL/releases/download/v1.0.42/TangYuanCL-1.0.42.exe' }
   const officialFile = path.join(root, official.assetName); fs.writeFileSync(officialFile, 'fixture')
   fs.writeFileSync(path.join(root, 'pending-update.json'), JSON.stringify({ release: official, file: officialFile }))
   assert.equal(api.getPendingUpdate().release.version, '1.0.42')

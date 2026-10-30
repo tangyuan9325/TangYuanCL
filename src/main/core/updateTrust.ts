@@ -1,5 +1,5 @@
 import { app } from 'electron'
-import { GITHUB_REPO } from '../../shared/branding'
+import { GITHUB_REPO, PRODUCT_NAME } from '../../shared/branding'
 import type { ReleaseInfo } from '../../shared/types'
 
 /** 测试覆盖只能用于开发进程，且必须同时指定独立数据目录和模拟 API。 */
@@ -16,5 +16,5 @@ export function trustedUpdateRelease(release: ReleaseInfo | undefined): boolean 
 }
 
 export function updateAssetName(version: string, platform = process.platform, arch = process.arch): string {
-  return platform === 'darwin' ? `KAMUCL-${version}-mac-${arch}.zip` : `KAMUCL-${version}.exe`
+  return platform === 'darwin' ? `${PRODUCT_NAME}-${version}-mac-${arch}.zip` : `${PRODUCT_NAME}-${version}.exe`
 }

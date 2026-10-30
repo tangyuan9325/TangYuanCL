@@ -13,6 +13,7 @@ import { getSettings } from './settings'
 import { exitHistory } from './exitHistory'
 import { getLastLaunch } from './launch'
 import { analyzeDiagnosticText } from './diagnosticRules'
+import { analyzeInstanceCrashes } from './crashReport'
 import { samePath } from './folderPaths'
 import { safePath, type BackupProgress } from './backupStore'
 import { withFileJob } from './fileJobs'
@@ -43,6 +44,9 @@ export async function diagnoseInstance(target:InstanceTarget,signal?:AbortSignal
   let session:string|undefined
   if(context?.logDir&&context.startedAt){session=String(context.startedAt);const logDir=String(context.logDir);let text='';for(const name of ['stdout.log','stderr.log'])try{const f=await safePath(logDir,name);text+='\n'+await tail(f)}catch{};findings.push(...analyzeDiagnosticText(text))}
   else findings.push({rule:'no-session',title:'暂无启动日志（属正常状态，非异常）',confidence:'unknown',evidence:'本实例尚未通过 KAMUCL 启动过，因此没有可分析的启动日志；此条为环境检查结果的说明，不代表存在故障。',advice:'这是首次诊断的正常提示，无需处理。若之后启动失败，再运行诊断即可看到对应会话的原因。'})
+  // 游戏自身崩溃时，关键成因只写在 crash-reports/*.txt 里，启动日志不一定包含；
+  // 与日志结论去重后合并，避免同一原因重复展示。
+  try{for(const f of await analyzeInstanceCrashes(c.dir,session))if(!findings.some(x=>x.rule===f.rule))findings.push(f)}catch{/* 崩溃报告不可读不影响其余诊断 */}
   if(findings.some(f=>f.action==='mods'))try{const mods=await scanModDirectory(path.join(c.dir,'mods'),false);for(const f of findings.filter(f=>f.action==='mods'))f.mods=mods.filter(m=>f.evidence.includes(m.fileName)||(m.id&&new RegExp('(?:^|[^a-zA-Z0-9_])'+m.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:$|[^a-zA-Z0-9_])').test(f.evidence))).map(m=>({fileName:m.fileName,name:m.name||m.fileName,icon:m.iconDataUrl}))}catch{}
   for(const[id,p]of plans)if(Date.now()-p.time>30*60*1000)plans.delete(id)
   const id=crypto.randomUUID();plans.set(id,{target:c.target,files:bad.filter(f=>f.url),metadata:JSON.stringify(merged),time:Date.now()})

@@ -2,6 +2,9 @@
  * 品牌与渠道常量（改这里，不要散落代码深处）。
  */
 
+/** 运行时产品名，必须与 package.json 的 productName 一致（构建产物与自更新资产按它命名） */
+export const PRODUCT_NAME = 'TangYuanCL'
+
 /** GitHub 仓库（自更新检查与 Release 下载来源） */
 export const GITHUB_REPO = 'tangyuan9325/TangYuanCL'
 
