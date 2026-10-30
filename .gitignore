@@ -1,0 +1,16 @@
+node_modules/
+out/
+release*/
+素材/
+*.log
+*.part
+.DS_Store
+bridge/build/
+bridge/dist/
+*.rar
+
+bridge/.cache/
+
+# QA 截图/证据产物不入库（历史上曾把 5870 张截图塞进仓库，体积膨胀到 595 MB）
+# 现有残留已迁移说明见 docs/validation-archive.md；历史提交需用 git filter-repo 清理
+docs/validation-*/

@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "paths": {
+      "electron": ["scripts/electron-shim.ts"]
+    }
+  },
+  "include": ["./**/*.ts", "../src/main/**/*.ts", "../src/shared/**/*.ts"]
+}
