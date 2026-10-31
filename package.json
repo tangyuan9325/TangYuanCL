@@ -1,7 +1,7 @@
 {
   "name": "tangyuancl",
   "productName": "TangYuanCL",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "TangYuanCL - 简约美观的一键式 Minecraft 启动器（基于 KAMUCL 修改）",
   "main": "out/main/index.js",
   "scripts": {
