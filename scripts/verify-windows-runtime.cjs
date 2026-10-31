@@ -4,15 +4,21 @@ const asar = require('asar')
 function verifyWindowsRuntime(appOutDir) {
   const archive = path.join(appOutDir, 'resources/app.asar')
   const names = asar.listPackage(archive).map(n => n.replaceAll('\\', '/').replace(/^\//, ''))
-  // 1.1.7 intentionally adds seven lossless user-provided illustrations (~10 MiB).
-  // Verify those exact assets separately; keep the existing 16 MiB code/dependency budget.
+  // The launcher bundles the maintainer's own wallpapers for the launch screen.
+  // Verify those assets match their sources byte for byte (no silent re-encode)
+  // and stay inside the reviewed budget; keep the 16 MiB code/dependency budget.
+  // The list is read from the shared manifest so it cannot drift from the app.
   const digest = bytes => crypto.createHash('sha256').update(bytes).digest('hex')
+  const manifest = fs.readFileSync(path.resolve(__dirname, '../src/shared/launchImages.ts'), 'utf8')
+  const files = [...manifest.matchAll(/file: '([^']+\.webp)'/g)].map(match => match[1])
+  assert(files.length > 0, 'Bundled wallpaper manifest is empty')
   let illustrationBytes = 0
-  for (const id of ['piston', 'brewer', 'cannon', 'cactus', 'farmer', 'camp', 'sunset']) {
+  for (const file of files) {
+    const id = file.replace(/\.webp$/, '')
     const matches = names.filter(name => new RegExp('^out/renderer/assets/' + id + '-[^/]+\\.webp$').test(name))
     assert.equal(matches.length, 1, 'Exactly one bundled illustration: ' + id)
     const bytes = asar.extractFile(archive, matches[0].split('/').join(path.sep))
-    const source = fs.readFileSync(path.resolve(__dirname, '../src/renderer/src/assets/launch', id + '.webp'))
+    const source = fs.readFileSync(path.resolve(__dirname, '../src/renderer/src/assets/launch', file))
     assert.equal(digest(bytes), digest(source), 'Bundled illustration changed: ' + id)
     illustrationBytes += bytes.length
   }
