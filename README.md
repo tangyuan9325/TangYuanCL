@@ -1,6 +1,3 @@
-<div align="center">
-
-<img src="build/icon-512.png" width="128" alt="TangYuanCL Logo">
 
 # TangYuanCL
 
