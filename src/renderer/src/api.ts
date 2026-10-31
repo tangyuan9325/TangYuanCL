@@ -32,6 +32,8 @@ import type {
   ModInstallResult,
   ModpackInfo,
   ImportProbeResult,
+  OptiFineEntry,
+  OptiFineInstallResult,
   ModpackInstallRequest,
   MsDeviceCodeInfo,
   ProgressEvent,
@@ -182,6 +184,8 @@ export const resetVersionThumbnail = (id: string, folder?: string) =>
 export const listLoaders = (loader: LoaderName, mc: string) =>
   invoke<string[]>(IPC.loadersList, loader, mc)
 export const listFabricApi = (mc: string) => invoke<FabricApiVersion[]>(IPC.fabricApiList, mc)
+export const listOptiFineVersions = () => invoke<OptiFineEntry[]>(IPC.optifineList)
+export const installOptiFine = (fileName: string) => invoke<OptiFineInstallResult>(IPC.optifineInstall, fileName)
 
 // ---------------- 整合包 ----------------
 /** 只解析整合包元信息（不解压不下载），供导入确认弹窗展示；失败抛错 */

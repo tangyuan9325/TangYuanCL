@@ -12,12 +12,14 @@ import {
   getIsolationPlan,
   getSettings,
   getInstalled,
+  installOptiFine,
   installVersion,
   launchGame,
   listFabricApi,
   listFolders,
   listJava,
   listLoaders,
+  listOptiFineVersions,
   openDir,
   openGameFolder,
   showFolderContextMenu,
@@ -55,6 +57,7 @@ import type {
   ImageFit,
   IsolationMigrationPlan,
   LoaderName,
+  OptiFineEntry,
   RemoteVersion
 } from '@shared/types'
 
@@ -925,6 +928,50 @@ async function confirmIsolation() {
     }
   }
 }
+// ---------------- OptiFine ----------------
+const optifine = reactive({
+  open: false,
+  loading: false,
+  error: '',
+  busy: '',
+  entries: [] as OptiFineEntry[],
+  mcFilter: ''
+})
+const optifineMcVersions = computed(() => {
+  const seen = new Set<string>()
+  for (const entry of optifine.entries) seen.add(entry.mcVersion)
+  return [...seen].sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
+})
+const optifineShown = computed(() =>
+  optifine.mcFilter ? optifine.entries.filter((e) => e.mcVersion === optifine.mcFilter) : optifine.entries
+)
+async function openOptiFine() {
+  optifine.open = true
+  optifine.error = ''
+  optifine.loading = true
+  try {
+    optifine.entries = await listOptiFineVersions()
+    if (!optifine.mcFilter && optifine.entries.length) optifine.mcFilter = optifine.entries[0].mcVersion
+  } catch (error) {
+    optifine.error = errText(error)
+  } finally {
+    optifine.loading = false
+  }
+}
+async function onInstallOptiFine(entry: OptiFineEntry) {
+  optifine.busy = entry.fileName
+  optifine.error = ''
+  try {
+    const result = await installOptiFine(entry.fileName)
+    toast(`已安装 OptiFine ${result.edition}（实例 ${result.id}）`, 'success')
+    optifine.open = false
+    await refreshInstalled()
+  } catch (error) {
+    optifine.error = errText(error)
+  } finally {
+    optifine.busy = ''
+  }
+}
 </script>
 
 <template>
@@ -1016,6 +1063,10 @@ async function confirmIsolation() {
         </svg>
         <input v-model="store.searchKeyword" placeholder="搜索版本号…" />
       </div>
+
+      <button class="capsule" data-ui="games:optifine-open" type="button" @click="openOptiFine">
+        OptiFine 安装器
+      </button>
 
       <div class="filter-capsules">
         <button
@@ -1319,7 +1370,38 @@ async function confirmIsolation() {
       </div>
     </Teleport>
 
-    <!-- 实例图标选择弹窗 -->
+    <!-- OptiFine 安装弹窗 -->
+    <Teleport to="body">
+      <div v-if="optifine.open" class="modal-mask" @pointerdown.self="optifine.open = false">
+        <div class="modal" data-ui="games:optifine-modal">
+          <h3 class="modal-title">安装 OptiFine</h3>
+          <p class="modal-label">来自 optifine.net 官方安装器，安装为独立实例，不会改动现有实例。</p>
+          <label class="modal-label">
+            Minecraft 版本
+            <select v-model="optifine.mcFilter" class="input">
+              <option v-for="mc in optifineMcVersions" :key="mc" :value="mc">{{ mc }}</option>
+            </select>
+          </label>
+          <p v-if="optifine.loading" class="modal-label">正在获取官方版本列表…</p>
+          <p v-else-if="optifine.error" class="loaders-error">{{ optifine.error }}</p>
+          <div v-else class="optifine-list">
+            <div v-for="entry in optifineShown" :key="entry.fileName" class="optifine-row">
+              <div>
+                <strong>{{ entry.edition }}</strong>
+                <small class="muted">{{ entry.preview ? '预览版' : entry.prerelease ? '测试版' : '正式版' }}</small>
+              </div>
+              <button class="btn btn-gold btn-sm" :disabled="!!optifine.busy" @click="onInstallOptiFine(entry)">
+                {{ optifine.busy === entry.fileName ? '安装中…' : '安装' }}
+              </button>
+            </div>
+            <p v-if="!optifineShown.length" class="modal-label">该版本没有可用的 OptiFine 发行</p>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-ghost" @click="optifine.open = false">关闭</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
     <IconPickerModal
       :open="iconModal.open"
       :version-id="iconModal.id"
@@ -2223,5 +2305,26 @@ async function confirmIsolation() {
  .scope-count { display:none; }
  .installed-search { flex-basis:100%; order:1; }
 }
-
+.optifine-list {
+  display: grid;
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+  margin: 12px 0;
+}
+.optifine-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.optifine-row small {
+  display: block;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-size: 12px;
+}
 </style>

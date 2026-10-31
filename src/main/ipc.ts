@@ -53,6 +53,8 @@ import * as settings from './core/settings'
 import * as accounts from './core/accounts'
 import * as versions from './core/versions'
 import * as loaders from './core/loaders'
+import { listOptiFineVersions } from './core/optifine'
+import { installOptiFine } from './core/optifineInstall'
 import * as java from './core/java'
 import * as launch from './core/launch'
 import * as servers from './core/servers'
@@ -530,6 +532,33 @@ export function registerIpc(getWin: () => BrowserWindow | null): void {
   ipcMain.handle(IPC.fabricApiList, (_e, mcVersion: string) =>
     loaders.listFabricApiVersions(String(mcVersion ?? ''))
   )
+
+  // ---------------- OptiFine ----------------
+  ipcMain.handle(IPC.optifineList, () => listOptiFineVersions())
+  ipcMain.handle(IPC.optifineInstall, (_e, fileName: string) => {
+    const name = String(fileName ?? '')
+    const task = registerTask(`安装 OptiFine ${name}`, 'version')
+    const progressGuard = new ProgressEventGuard()
+    let lastStage = ''
+    const taskEmit = (e: ProgressEvent): void => {
+      const normalized = progressGuard.normalize(e)
+      if (!['error', 'done'].includes(normalized.stage)) lastStage = normalized.stage
+      emit({ ...normalized, taskId: task.id, taskTitle: task.title })
+    }
+    return installOptiFine(name, taskEmit, task.controller.signal)
+      .then((result) => {
+        send(IPC_EVENT.installDone, { versionId: result.id, installedId: result.id, ok: true, taskId: task.id })
+        return result
+      })
+      .catch((error) => {
+        const cancelled = isCancelError(error)
+        const text = cancelled ? '已取消' : errText(error)
+        if (!cancelled) taskEmit({ stage: 'error', progress: 0, text: `OptiFine 安装失败: ${text}` })
+        send(IPC_EVENT.taskDone, { taskId: task.id, ok: false, error: text, cancelled, stage: cancelled ? undefined : lastStage })
+        throw error
+      })
+      .finally(() => finishTask(task.id))
+  })
 
   // ---------------- 整合包 ----------------
   ipcMain.handle(IPC.modpackSupplyFiles, async (_e, token: string) => {

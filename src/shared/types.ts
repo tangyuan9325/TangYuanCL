@@ -645,6 +645,8 @@ export const IPC = {
   versionsResetThumbnail: 'versions:resetThumbnail', // (versionId: string) => void
   loadersList: 'loaders:list', // (loader: LoaderName, mcVersion: string) => string[]
   fabricApiList: 'loaders:fabricApi', // (mcVersion: string) => FabricApiVersion[]
+  optifineList: 'optifine:list', // () => OptiFineEntry[]  官方下载目录（需联网）
+  optifineInstall: 'optifine:install', // (fileName: string) => OptiFineInstallResult  下载官方安装器并静默安装；进度走 event:progress
 
   // Java
   javaList: 'java:list', // () => JavaInfo[]（5 分钟缓存）
@@ -884,6 +886,21 @@ export interface ModInstallPlan {
 }
 
 /** 整合包探测信息（导入确认弹窗用） */
+export interface OptiFineEntry {
+  /** 原始文件名，如 OptiFine_1.20.1_HD_U_I6.jar */
+  fileName: string
+  mcVersion: string
+  /** 展示用版本串，如 HD U I6 */
+  edition: string
+  preview: boolean
+  prerelease: boolean
+}
+export interface OptiFineInstallResult {
+  id: string
+  mcVersion: string
+  edition: string
+}
+
 export interface ModpackInfo {
   format: 'mrpack' | 'curseforge' | 'fullpack'
   /** 包内声明的名称 */
