@@ -187,7 +187,7 @@ function mapMrVersions(arr: MrVersion[], projectId?: string): CommunityFile[] {
 /** 官方 API（需 x-api-key，免费申请见设置页提示）；镜像为无 key 时的降级通道 */
 const CF_OFFICIAL = 'https://api.curseforge.com/v1'
 const CF_MIRROR = 'https://mod.mcimirror.top/curseforge/v1'
-/** 内置默认 Key（卡慕注册的 KAMUCL 官方应用 Key，开箱即用；用户可在设置页换成自己的） */
+/** 内置默认 Key：本分支不使用上游的凭证（见 curseforgeKey.ts），需要官方通道请在设置页填自己的 */
 import { CF_BUILTIN_KEY } from './curseforgeKey'
 
 /** 当前生效的 CurseForge 通道：有 key（用户设置 > 内置默认）走官方；仅内置失效时才落镜像 */

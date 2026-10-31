@@ -47,11 +47,11 @@ test('launch combo lives in the banner and owns the launch chain (1.0.18 还原�
   assert.ok(!fs.existsSync('src/renderer/src/components/LaunchFab.vue'), 'LaunchFab.vue must be deleted')
 })
 
-test('creator card uses theme tokens, keyboard focus and correct external Bilibili link', () => {
-  assert.match(creator, /href="https:\/\/space\.bilibili\.com\/9596327"/)
+test('creator card uses theme tokens, keyboard focus and correct external project link', () => {
+  assert.match(creator, /href="https:\/\/github\.com\/tangyuan9325\/TangYuanCL"/)
   assert.match(creator, /target="_blank"/)
   assert.match(creator, /rel="noopener noreferrer"/)
-  assert.match(creator, /aria-label="访问卡慕/)
+  assert.match(creator, /aria-label="访问本项目仓库/)
   assert.match(creator, /<button\b[^>]*class="creator-toggle"/)
   assert.match(creator, /useMotion/)
   assert.match(creator, /var\(--surface-content\)/)
