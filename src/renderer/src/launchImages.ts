@@ -1,12 +1,24 @@
 import { BUILTIN_LAUNCH_IMAGES } from '@shared/launchImages'
-import piston from './assets/launch/piston.webp'
-import brewer from './assets/launch/brewer.webp'
-import cannon from './assets/launch/cannon.webp'
-import cactus from './assets/launch/cactus.webp'
-import farmer from './assets/launch/farmer.webp'
-import camp from './assets/launch/camp.webp'
-import sunset from './assets/launch/sunset.webp'
+import bg01 from './assets/launch/HV0ftLZXcAAq5LS.webp'
+import bg02 from './assets/launch/HV3-TN0a4AA3riG.webp'
+import bg03 from './assets/launch/HV3zSlZbQAA91Wu.webp'
+import bg04 from './assets/launch/HV49o55aoAEU3sv.webp'
+import bg05 from './assets/launch/HV4It4ZbEAA3iiz.webp'
+import bg06 from './assets/launch/HV4PR2oaIAAK4IY.webp'
+import bg07 from './assets/launch/HV4PRO1bcAA9njM.webp'
+import bg08 from './assets/launch/HV4PlS_boAAXAUP.webp'
+import bg09 from './assets/launch/HV4Z3VKa8AA_ti3.webp'
+import bg10 from './assets/launch/HV4ylJpbQAAeW-Z.webp'
+import bg11 from './assets/launch/HV4z4vBbIAAHDcW.webp'
+import bg12 from './assets/launch/HV5-xBGbsAAOUU9.webp'
+import bg13 from './assets/launch/HV6doCHbUAAgG2G.webp'
+import bg14 from './assets/launch/HV7oGS-a0AAy9wC.webp'
+import bg15 from './assets/launch/HV7pV-vbYAA27LC.webp'
+import bg16 from './assets/launch/HV8Svh-awAA69_U.webp'
+import bg17 from './assets/launch/HV8tVSJaAAAYtb5.webp'
+import bg18 from './assets/launch/HVyd98KagAAISjN.webp'
+import bg19 from './assets/launch/HVyxQrsasAAGRy6.webp'
+import bg20 from './assets/launch/HVzh7bwasAEI0Xk.webp'
 
-const sources = { 'piston.webp': piston, 'brewer.webp': brewer, 'cannon.webp': cannon,
-  'cactus.webp': cactus, 'farmer.webp': farmer, 'camp.webp': camp, 'sunset.webp': sunset }
+const sources = { 'HV0ftLZXcAAq5LS.webp': bg01, 'HV3-TN0a4AA3riG.webp': bg02, 'HV3zSlZbQAA91Wu.webp': bg03, 'HV49o55aoAEU3sv.webp': bg04, 'HV4It4ZbEAA3iiz.webp': bg05, 'HV4PR2oaIAAK4IY.webp': bg06, 'HV4PRO1bcAA9njM.webp': bg07, 'HV4PlS_boAAXAUP.webp': bg08, 'HV4Z3VKa8AA_ti3.webp': bg09, 'HV4ylJpbQAAeW-Z.webp': bg10, 'HV4z4vBbIAAHDcW.webp': bg11, 'HV5-xBGbsAAOUU9.webp': bg12, 'HV6doCHbUAAgG2G.webp': bg13, 'HV7oGS-a0AAy9wC.webp': bg14, 'HV7pV-vbYAA27LC.webp': bg15, 'HV8Svh-awAA69_U.webp': bg16, 'HV8tVSJaAAAYtb5.webp': bg17, 'HVyd98KagAAISjN.webp': bg18, 'HVyxQrsasAAGRy6.webp': bg19, 'HVzh7bwasAEI0Xk.webp': bg20 }
 export const builtInLaunchImages = BUILTIN_LAUNCH_IMAGES.map(image => ({ ...image, src: sources[image.file] }))

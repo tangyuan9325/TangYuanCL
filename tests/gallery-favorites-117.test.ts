@@ -11,26 +11,39 @@ import { BUILTIN_LAUNCH_IMAGES } from '../src/shared/launchImages'
 import { activeCarouselKeys, carouselImages, carouselKeys, carouselSelection, carouselTiming, MAX_CAROUSEL_IMAGES } from '../src/shared/appearancePolicy'
 
 const builtins = BUILTIN_LAUNCH_IMAGES.map(image => image.key)
-test('all seven bundled illustrations exactly preserve the pixels supplied by the user', async () => {
+test('all bundled wallpapers exactly preserve the pixels supplied by the maintainer', async () => {
   const pixels = [
-    'e8c74509e9f57c18c99df123e87bdc41752b069f2876671893b691a124b40456',
-    '30a8f343d3549ca13b6c5b69146b5e0b86e32d0d9f21b997ba5915fc2249808d',
-    'be20c272883fbeee485d09f8b033d1fbd030ba3a9df0a1cb1e2e756b5fbf1c76',
-    '0945dacc3d2c8d292c4418c19afe0e317771c1c2ebf7d926697de5112a349503',
-    '5b8bac38860c285b2abcf5361682e0671e08a62d55229afff1c647736e2c8a33',
-    '042a68cbf1faded3d6e8b3b29e12a3ee4bf4df5b74d1537e6cdfb42a84d95e4a',
-    '0fd4efc56307d9b90b4c721361f5d193c1ce464390fff5ce630177ef4af9535f'
+    '4165d02969289e2c75284acb5fa03b402d05ee88155b982f37d4e854cb34b263',
+    'e012d74db7be030b1d2724f1585eb30cf295ccdba7ee44b6cacef5776d253bd8',
+    'a0189690e92b418cee5cfa2e244dda71fde100f62d05d144200ebe35bb03bebc',
+    '4c48409a91b82e3d458968703780f6352810eb33253ba7e262b86f7d719a4fb6',
+    '406ca71bf46c1f8644bad689b4576e20737b6d67b959524f4c98601f2f2a7894',
+    '1adf01216f5bcf6691ba308a28ccfa3639f8af7d8318903892d8cccf93761493',
+    'dade1762955a041cacc04b62707b0f630356b4ab3a852619e9322a6b8edd6ba2',
+    '2180e4ca282607b5299bb299bfa0e6736c13705e165a0ceb68c2c8b45517edbb',
+    '17cc12b5afc6427c2668024aa12ae362d4fe0c587f604e941a4af7acdfc5c24c',
+    'f04df9b3943c67e29d28a50d958073c2957d674faec66e238e43b6a6d9396376',
+    '7a1825759368ee099099209100d8d55f1e205e894991cbd36940ea5d8369ecb8',
+    'd3047f524738cf7d253b43096382dfaffc1c75cce9e7718c36e5137dcbf90a81',
+    '0d93c73b714846517df67433e35737577ba66ce822e0d17813956fed72a76a23',
+    'f6e24eaa51176edb483edc92be274dd8a51dd5f16fead21abb35ff5c335284e4',
+    'e855d222eb06ca3c1474a895c64ce2b873640933e682a59e6154cbfe21ab9da2',
+    'b2c343283e52a1efd0fc51d725bb2793d873d05312cfe6ecb7ed8d83f8180860',
+    '7035542d5461d6dbed8f58aa8a65bd4b288e887660391b4ff138ed55215b6fb5',
+    'd51520f6af3f4c792310d6ae6f38ea396799a6f0a73653a70c6d8e5afc52bdbc',
+    'b1256352b20fa32542f1b4662a81b859b736aa8db2b89e60fc6a904505031717',
+    '4c10fd6c39279bfb8c6ac70679770727b2cdd16059046765560973bbf4b10f6d'
   ]
   for (const [index, image] of BUILTIN_LAUNCH_IMAGES.entries()) {
     const decoded = await sharp(path.join('src/renderer/src/assets/launch', image.file)).raw().toBuffer()
     assert.equal(createHash('sha256').update(decoded).digest('hex'), pixels[index], image.title)
   }
 })
-test('new gallery mixes all seven builtins and retained legacy custom pictures in stable order', () => {
+test('new gallery mixes all bundled builtins and retained legacy custom pictures in stable order', () => {
   const old = { image: 'first.png', images: ['first.png', 'second.png', 'first.png'], fit: 'crop' as const }
   assert.deepEqual(activeCarouselKeys(old), [...builtins, 'first.png', 'second.png'])
   assert.deepEqual(carouselImages(old), ['first.png', 'second.png'])
-  assert.equal(carouselKeys({ images: Array.from({ length: 60 }, (_, i) => 'custom-' + i) }).length, 7 + MAX_CAROUSEL_IMAGES)
+  assert.equal(carouselKeys({ images: Array.from({ length: 60 }, (_, i) => 'custom-' + i) }).length, builtins.length + MAX_CAROUSEL_IMAGES)
 })
 test('deselection retains files and timings, empty selection never resurrects defaults', () => {
   const custom = 'managed-custom.webp'
