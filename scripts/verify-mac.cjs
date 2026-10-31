@@ -4,7 +4,7 @@ const appPath=path.resolve(process.argv[2]),arch=process.argv[3],version=require
 assert.equal(process.platform,'darwin');assert.equal(process.arch,arch)
 const mascotProofRevision=version==='1.1.9'?'119':'118',mascotRecordingKind=version==='1.1.9'?'logo':'leader'
 const stage=process.argv[4]||(appPath.split(path.sep).includes('dmg-mount')?'dmg':'app');assert(['app','dmg'].includes(stage),'proof stage must be app or dmg')
-const exe=path.join(appPath,'Contents/MacOS/KAMUCL'),proof=path.resolve(`release/mac-proof-${arch}-${stage}`)
+const exe=path.join(appPath,'Contents/MacOS/TangYuanCL'),proof=path.resolve(`release/mac-proof-${arch}-${stage}`)
 fs.mkdirSync(proof,{recursive:true})
 const binary=execFileSync('file',[exe],{encoding:'utf8'});assert(binary.includes(arch==='x64'?'x86_64':'arm64'))
 const env={...process.env};delete env.ELECTRON_RUN_AS_NODE
@@ -29,7 +29,7 @@ async function main(){
  let content=''
  for(let i=0;i<30;i++){try { const r=await call('Runtime.evaluate',{expression:'document.body.innerText',returnByValue:true});content=r.result.value||''; } catch(e) { if(!String(e).includes('Cannot find default execution context'))throw e; }if(content.includes('首页')&&content.includes(version))break;await wait(1000)}
  assert(content.includes('首页')&&content.includes(version),'main UI missing')
- const checks=await call('Runtime.evaluate',{expression:`(async()=>{const folders=await window.kamucl.invoke('folders:list');const scan=await window.kamucl.invoke('folders:scan',folders.active);return {platform:document.documentElement.dataset.platform,customButtons:document.querySelectorAll('.win-btn').length,logoTop:document.querySelector('.logo-area').getBoundingClientRect().top,folderStatus:scan.status,folderPath:folders.active}})()`,awaitPromise:true,returnByValue:true});
+ const checks=await call('Runtime.evaluate',{expression:`(async()=>{const folders=await window.tangyuancl.invoke('folders:list');const scan=await window.tangyuancl.invoke('folders:scan',folders.active);return {platform:document.documentElement.dataset.platform,customButtons:document.querySelectorAll('.win-btn').length,logoTop:document.querySelector('.logo-area').getBoundingClientRect().top,folderStatus:scan.status,folderPath:folders.active}})()`,awaitPromise:true,returnByValue:true});
  const macUI=checks.result.value;assert.equal(macUI.platform,'darwin');assert.equal(macUI.customButtons,0);assert(macUI.logoTop>=38,'native traffic light area overlaps branding');assert.equal(macUI.folderStatus,'ready','default folder missing on first launch');
  await wait(3000)
  const screenshot=await call('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(proof,'main.png'),Buffer.from(screenshot.data,'base64'))
@@ -87,7 +87,7 @@ async function main(){
  assert(facePixels>20&&shirtPixels>20,'default skin texture not rendered')
  // The black-purple default intentionally uses a 96% solid surface. Test native
  // material using the existing translucent black-orange theme, without changing defaults.
- await call('Runtime.evaluate',{expression:`window.kamucl.invoke('settings:set',{theme:'black-orange'})`,awaitPromise:true})
+ await call('Runtime.evaluate',{expression:`window.tangyuancl.invoke('settings:set',{theme:'black-orange'})`,awaitPromise:true})
  // Settings IPC persists state; the normal settings view updates its Vue store.
  // Reload to exercise the same saved-theme startup path without poking Vue internals.
  await call('Page.reload');await wait(3000)
@@ -120,7 +120,7 @@ async function main(){
    nativeMaterial.samples=samples;nativeMaterial.difference=Math.max(...samples[0].map((v,i)=>Math.abs(v-samples[1][i])))
    assert(nativeMaterial.difference>2,'native macOS window still opaque over changing desktop background')
  }
- await call('Runtime.evaluate',{expression:`window.kamucl.invoke('settings:set',{theme:'transparent'})`,awaitPromise:true})
+ await call('Runtime.evaluate',{expression:`window.tangyuancl.invoke('settings:set',{theme:'transparent'})`,awaitPromise:true})
  fs.writeFileSync(path.join(proof,'verification.json'),JSON.stringify({version,arch,stage,binary,mainUI:true,macUI,skin:{facePixels,shirtPixels,capture:skinCapture},nativeMaterial,url:page.url},null,2));ws.close()
  console.log('PASS native macOS '+arch+' packaged app '+version)
 }
@@ -138,9 +138,9 @@ main().finally(async()=>{
  try{
   // Separate disposable process starts native mascot audio cold, without the full
   // header's MediaRecorder/tap hooks. Preserve its diagnostic evidence separately.
-  if(version==='1.1.9')execFileSync(process.execPath,['scripts/verify-ui-refinement.cjs'],{env:{...env,KAMUCL_GUI_APP:exe,KAMUCL_EXTENSION_GUI:'1',KAMUCL_EXTENSION_ONLY:'1',KAMUCL_SKIP_EXTENSION_BASE:'1',KAMUCL_UI_MODULE:'motion119',KAMUCL_TEST_THEME:'black-orange'},stdio:'inherit',timeout:180000})
+  if(version==='1.1.9')execFileSync(process.execPath,['scripts/verify-ui-refinement.cjs'],{env:{...env,TANGYUANCL_GUI_APP:exe,TANGYUANCL_EXTENSION_GUI:'1',TANGYUANCL_EXTENSION_ONLY:'1',TANGYUANCL_SKIP_EXTENSION_BASE:'1',TANGYUANCL_UI_MODULE:'motion119',TANGYUANCL_TEST_THEME:'black-orange'},stdio:'inherit',timeout:180000})
   execFileSync(process.execPath,['scripts/verify-ui-refinement.cjs'],{
-   env:{...env,KAMUCL_GUI_APP:exe,KAMUCL_EXTENSION_GUI:'1',KAMUCL_EXTENSION_ONLY:'1',KAMUCL_TEST_THEME:'black-orange'},
+   env:{...env,TANGYUANCL_GUI_APP:exe,TANGYUANCL_EXTENSION_GUI:'1',TANGYUANCL_EXTENSION_ONLY:'1',TANGYUANCL_TEST_THEME:'black-orange'},
    stdio:'inherit',timeout:480000
   })
   for(const name of requiredProofs){const file=path.join('out',name);assert(fresh(file),'successful GUI run is missing current proof '+name);const result=JSON.parse(fs.readFileSync(file));assert.equal(result.version,version,'GUI proof must match this build: '+name);if('complete' in result)assert.equal(result.complete,true,'GUI proof must be complete: '+name)}

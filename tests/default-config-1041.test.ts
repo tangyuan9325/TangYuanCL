@@ -10,7 +10,7 @@ import { trackLaunchState, instanceLaunchBusy, type LaunchTracking } from '../sr
 
 let code: Promise<string>
 async function runtime(t: any, env: Record<string, string> = {}) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kamucl-defaults-'))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tangyuancl-defaults-'))
   t.after(() => fs.rmSync(root, { recursive: true, force: true }))
   code ??= build({ stdin: { contents: `export * from './src/main/core/defaultResourcePacks';export {getPendingUpdate} from './src/main/core/applyUpdate';export {checkLatest,currentVersion} from './src/main/core/selfUpdate';export {trustedUpdateRelease} from './src/main/core/updateTrust';export {setDefaultKey,syncKeysToGameDir} from './src/main/core/keybindings';`, resolveDir: process.cwd() }, platform: 'node', format: 'cjs', bundle: true, write: false, packages: 'external' }).then(r => r.outputFiles[0].text)
   const require = createRequire(path.resolve('package.json')), mod = { exports: {} as any }, requested: string[] = []
@@ -115,7 +115,7 @@ test('compatible defaults are selected on the first launch, clearing old false i
   const client = path.join(root, 'client.jar'), game = path.join(root, 'game'), resource = path.join(root, 'Fullbright.zip')
   const jar = new AdmZip(); jar.addFile('version.json', Buffer.from(JSON.stringify({ pack_version: { resource_major: 88, resource_minor: 0 } }))); jar.writeZip(client)
   const zip = new AdmZip(); zip.addFile('pack.mcmeta', Buffer.from(JSON.stringify({ pack: { pack_format: 15, min_format: [15, 0], max_format: [1000, 0], supported_formats: [15, 1000] } }))); zip.writeZip(resource)
-  const [p] = api.importDefaultResourcePacks([resource]), id = `file/KAMUCL-default-${p.id}-${p.name}`
+  const [p] = api.importDefaultResourcePacks([resource]), id = `file/TangYuanCL-default-${p.id}-${p.name}`
   fs.mkdirSync(game)
   fs.writeFileSync(path.join(game, 'options.txt'), `resourcePacks:["vanilla","file/Personal.zip","${id}"]\nincompatibleResourcePacks:["file/Personal.zip","${id}"]\nlang:zh_cn\n`)
   api.syncDefaultResourcePacks(game, '26.2', client)
@@ -143,7 +143,7 @@ test('unassigned key persists and syncs as unknown while other settings survive'
 })
 
 test('packaged updates ignore test overrides and reject local v99 pending/cache pollution', async t => {
-  const { root, api, requested } = await runtime(t, { KAMUCL_USERDATA_DIR: 'unused-test-dir', KAMUCL_UPDATE_API_BASE: 'http://127.0.0.1:8310', KAMUCL_VERSION_OVERRIDE: '99.0.0' })
+  const { root, api, requested } = await runtime(t, { TANGYUANCL_USERDATA_DIR: 'unused-test-dir', TANGYUANCL_UPDATE_API_BASE: 'http://127.0.0.1:8310', TANGYUANCL_VERSION_OVERRIDE: '99.0.0' })
   assert.equal(api.currentVersion(), '1.0.41')
   const file = path.join(root, 'TangYuanCL-99.0.0.exe'); fs.writeFileSync(file, 'fixture')
   const release = { version: '99.0.0', assetName: path.basename(file), assetUrl: 'http://127.0.0.1:8310/download/TangYuanCL-99.0.0.exe', assetSize: 7 }

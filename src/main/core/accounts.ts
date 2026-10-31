@@ -7,6 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import type { Account, MsDeviceCodeInfo } from '../../shared/types'
+import { DEFAULT_MS_CLIENT_ID } from '../../shared/types'
 import { getSettings } from './settings'
 import * as yggdrasil from './yggdrasil'
 import { microsoftFetch } from './microsoftTls'
@@ -33,12 +34,12 @@ function msAuthBase(_clientId: string): string {
   return 'https://login.microsoftonline.com/consumers/oauth2/v2.0'
 }
 
-/** 微软登录需要用户自注册的 Azure 应用 client_id；未配置时不发起登录。 */
+/** 微软登录 client_id：默认内置 Minecraft 官方启动器的公共客户端 ID，开箱即用。 */
 function requireMsClientId(): string {
-  const clientId = (getSettings().msClientId ?? '').trim()
+  const clientId = (getSettings().msClientId || DEFAULT_MS_CLIENT_ID).trim()
   if (!clientId) {
     throw new Error(
-      '尚未配置微软登录 Client ID。请在「设置 → 启动器行为与正版登录」中填入自行注册的 Azure 应用 client_id（可在 https://portal.azure.com 免费创建，redirect 公共客户端 + device code 权限）。'
+      '微软登录 Client ID 为空。请在「设置 → 微软登录 Client ID」中填入 Azure 应用 client_id，或清空该字段使用内置默认 ID。'
     )
   }
   return clientId
@@ -163,7 +164,7 @@ function load(): AccountsFile {
     try {
       persist()
     } catch (error) {
-      console.error('[KAMUCL] 账号凭据安全迁移失败，原文件保持不变:', error)
+      console.error('[TangYuanCL] 账号凭据安全迁移失败，原文件保持不变:', error)
     }
   }
   return cached

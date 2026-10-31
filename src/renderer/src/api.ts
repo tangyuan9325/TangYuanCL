@@ -1,5 +1,5 @@
 /**
- * 渲染进程对 preload 桥接（window.kamucl）的类型化封装。
+ * 渲染进程对 preload 桥接（window.tangyuancl）的类型化封装。
  * 所有 IPC 通道名一律取自 @shared/types 的 IPC / IPC_EVENT 常量。
  */
 import { refreshSkinAfter } from './skinRevision'
@@ -68,7 +68,7 @@ function invoke<T>(channel: string, ...args: unknown[]): Promise<T> {
       return a
     }
   })
-  return window.kamucl.invoke(channel, ...clean) as Promise<T>
+  return window.tangyuancl.invoke(channel, ...clean) as Promise<T>
 }
 
 // ---------------- 设置 ----------------
@@ -377,7 +377,7 @@ export const toggleDisableFs = (rel: string, name: string, folder?: string) => i
 
 // ---------------- 事件订阅（返回取消函数） ----------------
 function subscribe<T>(channel: string, cb: (payload: T) => void): () => void {
-  return window.kamucl.on(channel, (payload) => cb(payload as T))
+  return window.tangyuancl.on(channel, (payload) => cb(payload as T))
 }
 
 export const onProgress = (cb: (e: ProgressEvent) => void) =>

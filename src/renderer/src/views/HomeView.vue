@@ -50,7 +50,7 @@ import { trackBootTask } from '../bootTasks'
 import { managedImageUrl } from '../managedAssets'
 import { builtInLaunchImages } from '../launchImages'
 
-const LAST_VERSION_KEY = 'kamucl.lastVersion'
+const LAST_VERSION_KEY = 'tangyuancl.lastVersion'
 
 // ---------------- 当前实例与展示图 ----------------
 const selectedId = computed({get: () => store.resourceVersionId, set: id => { store.resourceVersionId = id }})
@@ -120,7 +120,7 @@ function stopBannerTimer() {
 function startBannerTimer() {
   stopBannerTimer()
   if (!banners.value.length) { playback = null; playbackKey = ''; bannerIndex.value = 0; return }
-  playbackKey = 'kamucl.carousel.' + bannerScope.value
+  playbackKey = 'tangyuancl.carousel.' + bannerScope.value
   let saved
   try { saved = JSON.parse(localStorage.getItem(playbackKey) ?? 'null') } catch { /* invalid bookmark */ }
   const settings = appearancePreview.value?.launchThumbnail

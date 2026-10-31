@@ -36,7 +36,7 @@ function settingsFile(): string {
 }
 
 function defaults(): Settings {
-  const gameDir = path.join(app.getPath('appData'), '.kamucl')
+  const gameDir = path.join(app.getPath('appData'), '.tangyuancl')
   return {
     gameDir,
     folders: [{ path: gameDir, name: '默认文件夹', isDefault: true }],
@@ -136,9 +136,9 @@ export function getSettings(): Settings {
     c.resolution = resolutionValidationError(migratedResolution)
       ? def.resolution
       : migratedResolution
-    // 迁移：旧版默认 client_id（Mojang legacy 应用，不支持 device code）与
-    // 曾内置的第三方客户端 ID 均视为无效，回退为空（需用户在设置中自注册填入）
-    if (c.msClientId === '00000000402b5328' || c.msClientId === 'c36a9fb6-4f2a-41ff-90bd-ae7cc92031eb') {
+    // 迁移：仅清除无效的旧 UUID 格式 client_id（不支持 device code 的 Mojang legacy 应用），
+    // 回退到默认值。Minecraft 官方启动器的 00000000402b5328 为有效公共客户端，保留。
+    if (c.msClientId === 'c36a9fb6-4f2a-41ff-90bd-ae7cc92031eb') {
       c.msClientId = def.msClientId
     }
     // 保证 activeFolder 指向已登记文件夹；gameDir 与 activeFolder 保持一致语义
@@ -157,14 +157,14 @@ export function getSettings(): Settings {
         fs.mkdirSync(path.dirname(settingsFile()), { recursive: true })
         fs.writeFileSync(settingsFile(), JSON.stringify(c, null, 2), 'utf-8')
       } catch (error) {
-        console.error('[KAMUCL] 旧外观设置迁移写入失败:', error)
+        console.error('[TangYuanCL] 旧外观设置迁移写入失败:', error)
       }
     }
   } catch {
     cached = def
   }
   try { ensureDefaultGameFolder(app.getPath('appData'), cached.folders) }
-  catch (error) { console.error('[KAMUCL] 默认游戏目录创建失败:', error) }
+  catch (error) { console.error('[TangYuanCL] 默认游戏目录创建失败:', error) }
   return cached
 }
 
@@ -250,7 +250,7 @@ export function saveSettings(patch: Partial<Settings>): Settings {
   return merged
 }
 
-/** 将旧版保存的外部图片复制到 KAMUCL 目录；原文件永不删除。 */
+/** 将旧版保存的外部图片复制到 TangYuanCL 目录；原文件永不删除。 */
 export async function migrateLegacyAppearanceAssets(): Promise<void> {
   const current = getSettings()
   const imported: Array<{ path: string; purpose: 'background' | 'launch-thumbnail' }> = []

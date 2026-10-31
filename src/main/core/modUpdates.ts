@@ -18,7 +18,7 @@ import { modHash, replaceModFiles, validateModFile } from './modTransaction'
 import { isModLocked, rememberModIdentity, transferModLock } from './modState'
 
 const MR_BASES = ['https://api.modrinth.com/v2', 'https://mod.mcimirror.top/modrinth/v2']
-const UA = { 'User-Agent': 'KAMUCL-Launcher (github.com/kamubaba-i/KAMUCL)' }
+const UA = { 'User-Agent': 'TangYuanCL-Launcher (github.com/tangyuan9325/TangYuanCL)' }
 const TIMEOUT = 15_000
 const updateLog=logScope('mod-updates')
 

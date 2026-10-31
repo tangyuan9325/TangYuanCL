@@ -1,13 +1,13 @@
 // Real portable cold/warm startup; private paths, no launcher settings and no Minecraft process.
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path'),assert=require('node:assert/strict'),{spawnSync}=require('node:child_process')
 const version=require('../package.json').version
-const root=fs.mkdtempSync(path.join(os.tmpdir(),'kamucl startup 中文-'))
-const exe=path.join(root,`KAMUCL ${version}.exe`)
-fs.copyFileSync(path.resolve(process.argv[2] || `release/KAMUCL-${version}.exe`),exe)
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'tangyuancl startup 中文-'))
+const exe=path.join(root,`TangYuanCL ${version}.exe`)
+fs.copyFileSync(path.resolve(process.argv[2] || `release/TangYuanCL-${version}.exe`),exe)
 const results=[]
 for(const phase of ['cold','warm']){
  const marker=path.join(root,phase+'.json'),probe=path.join(root,phase+'-paint.txt'),start=Date.now()
- const result=spawnSync(exe,['-e',`require('fs').writeFileSync(process.env.KAMUCL_START_PROOF,JSON.stringify({at:Date.now(),exe:process.execPath}));setTimeout(()=>{},1200)`],{env:{...process.env,ELECTRON_RUN_AS_NODE:'1',TEMP:root,TMP:root,KAMUCL_BOOT_PROBE:probe,KAMUCL_START_PROOF:marker},windowsHide:true,encoding:'utf8',timeout:90000})
+ const result=spawnSync(exe,['-e',`require('fs').writeFileSync(process.env.TANGYUANCL_START_PROOF,JSON.stringify({at:Date.now(),exe:process.execPath}));setTimeout(()=>{},1200)`],{env:{...process.env,ELECTRON_RUN_AS_NODE:'1',TEMP:root,TMP:root,TANGYUANCL_BOOT_PROBE:probe,TANGYUANCL_START_PROOF:marker},windowsHide:true,encoding:'utf8',timeout:90000})
  assert.ifError(result.error);assert.equal(result.status,0,result.stderr)
  const inner=JSON.parse(fs.readFileSync(marker,'utf8'));assert(fs.existsSync(probe),'native first-paint proof missing')
  const cache=path.join(path.dirname(inner.exe),'cache.ready');assert(fs.existsSync(cache))

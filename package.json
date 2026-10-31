@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.tangyuancl.launcher",
-    "productName": "KAMUCL",
+    "productName": "TangYuanCL",
     "directories": {
       "output": "release"
     },
@@ -42,7 +42,7 @@
       "out/main/WindowMaterial.exe",
       "out/main/GameWindowFocus.exe",
       "out/main/MacGameWindow",
-      "out/main/kamucl-bridge.jar"
+      "out/main/tangyuancl-bridge.jar"
     ],
     "beforePack": "scripts/portable-build-hook.cjs",
     "afterPack": "scripts/verify-windows-runtime.cjs",

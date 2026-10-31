@@ -111,7 +111,7 @@ async function fetchDataUrl(url: string): Promise<string | undefined> {
       return `data:image/png;base64,${buf.toString('base64')}`
     } catch (e) {
       if (attempt === 1) {
-        console.error(`[KAMUCL] 皮肤纹理下载失败(${url}):`, e instanceof Error ? e.message : e)
+        console.error(`[TangYuanCL] 皮肤纹理下载失败(${url}):`, e instanceof Error ? e.message : e)
         appendLauncherLog(`皮肤纹理下载失败(${url}): ${e instanceof Error ? e.message : e}`)
       }
     }
@@ -119,10 +119,10 @@ async function fetchDataUrl(url: string): Promise<string | undefined> {
   return undefined
 }
 
-/** 启动器自身诊断日志：gameDir/kamucl-logs/launcher.log */
+/** 启动器自身诊断日志：gameDir/tangyuancl-logs/launcher.log */
 function appendLauncherLog(line: string): void {
   try {
-    const dir = path.join(gameDir(), 'kamucl-logs')
+    const dir = path.join(gameDir(), 'tangyuancl-logs')
     fs.mkdirSync(dir, { recursive: true })
     fs.appendFileSync(
       path.join(dir, 'launcher.log'),
@@ -287,7 +287,7 @@ function persistHistory(): void {
     fs.mkdirSync(skinsDir(), { recursive: true })
     fs.writeFileSync(historyFile(), JSON.stringify(loadHistory(), null, 2), 'utf-8')
   } catch (e) {
-    console.error('[KAMUCL] 皮肤历史写入失败:', e)
+    console.error('[TangYuanCL] 皮肤历史写入失败:', e)
   }
 }
 
@@ -319,7 +319,7 @@ function saveHistory(buf: Buffer, variant: SkinVariant, sourceName?: string): vo
     fs.mkdirSync(skinsDir(), { recursive: true })
     fs.writeFileSync(path.join(skinsDir(), `${id}.png`), buf)
   } catch (e) {
-    console.error('[KAMUCL] 皮肤历史保存失败:', e)
+    console.error('[TangYuanCL] 皮肤历史保存失败:', e)
     return
   }
   list.unshift({ id, variant, time: Date.now(), name: sourceName || undefined, hash })

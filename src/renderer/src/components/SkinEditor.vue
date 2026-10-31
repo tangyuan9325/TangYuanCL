@@ -41,16 +41,16 @@ function flushPalette(): Promise<void> {
       try { await saveSettings({ skinEditorPalette: next }) }
       catch (error) { toast('调色板偏好未能保存：' + errText(error), 'error') }
     }
-  })().finally(() => { paletteWrite = undefined; window.kamucl.send('window:skinEditorPrefsPending', { ownerId, pending: !!pendingPalette }) })
+  })().finally(() => { paletteWrite = undefined; window.tangyuancl.send('window:skinEditorPrefsPending', { ownerId, pending: !!pendingPalette }) })
   return paletteWrite
 }
 watch(palettePreferences, value => {
   pendingPalette = normalizeSkinPalettePreferences(value)
-  window.kamucl.send('window:skinEditorPrefsPending', { ownerId, pending: true })
+  window.tangyuancl.send('window:skinEditorPrefsPending', { ownerId, pending: true })
   if (store.settings) store.settings.skinEditorPalette = pendingPalette
   clearTimeout(paletteTimer); paletteTimer = setTimeout(() => void flushPalette(), 350)
 }, { deep: true, flush: 'sync' })
-watch(busy, pending => window.kamucl.send('window:skinEditorBusy', { ownerId, pending }), { flush: 'sync' })
+watch(busy, pending => window.tangyuancl.send('window:skinEditorBusy', { ownerId, pending }), { flush: 'sync' })
 const parts = [{key:'head',name:'头部'},{key:'body',name:'身体'},{key:'leftArm',name:'左臂'},{key:'rightArm',name:'右臂'},{key:'leftLeg',name:'左腿'},{key:'rightLeg',name:'右腿'}]
 const views = [{name:'正面',yaw:0,pitch:0},{name:'背面',yaw:Math.PI,pitch:0},{name:'左侧',yaw:Math.PI/2,pitch:0},{name:'右侧',yaw:-Math.PI/2,pitch:0},{name:'俯视',yaw:0,pitch:Math.PI*5/12},{name:'仰视',yaw:0,pitch:-Math.PI*5/12}]
 const selectedView = ref('')
@@ -103,13 +103,13 @@ function newSkin(){if(canEdit()){endGesture();operationError.value='';snapshot=p
 async function save(){
   if(busy.value||finishingClose.value||disposed)return false
   beginOperation('正在保存皮肤…')
-  try{const saved=await window.kamucl.invoke('skin:editorSave',canvas.value.toDataURL('image/png'));if(saved){dirty.value=false;toast('皮肤 PNG 已保存','success')}return !!saved}catch(error){failOperation(error);return false}finally{finishOperation()}
+  try{const saved=await window.tangyuancl.invoke('skin:editorSave',canvas.value.toDataURL('image/png'));if(saved){dirty.value=false;toast('皮肤 PNG 已保存','success')}return !!saved}catch(error){failOperation(error);return false}finally{finishOperation()}
 }
 function openUpload(){if(canEdit()){endGesture();operationError.value='';uploadConfirm.value=true}}
 async function upload(){
   if(busy.value||finishingClose.value||disposed)return
   beginOperation('正在上传皮肤…')
-  try{await refreshSkinAfter(window.kamucl.invoke('skin:editorUpload',canvas.value.toDataURL('image/png'),variant.value,store.selectedAccount?.id));uploadConfirm.value=false;emit('uploaded');toast('皮肤已上传，预览与历史已更新','success')}catch(error){failOperation(error)}finally{finishOperation()}
+  try{await refreshSkinAfter(window.tangyuancl.invoke('skin:editorUpload',canvas.value.toDataURL('image/png'),variant.value,store.selectedAccount?.id));uploadConfirm.value=false;emit('uploaded');toast('皮肤已上传，预览与历史已更新','success')}catch(error){failOperation(error)}finally{finishOperation()}
 }
 function requestClose(intent:CloseIntent={kind:'editor'}){if(disposed)return;closeIntent.value=mergeSkinCloseIntent(closeIntent.value,intent);if(finishingClose.value)return;endGesture();uploadConfirm.value=false;processClose()}
 function processClose(){if(!closeIntent.value||busy.value||finishingClose.value||disposed)return;if(dirty.value)askClose.value=true;else void finishClose()}
@@ -119,8 +119,8 @@ async function finishClose(){
   if(finishingClose.value||busy.value||disposed)return
   endGesture();finishingClose.value=true;askClose.value=false;uploadConfirm.value=false;clearTimeout(paletteTimer);await flushPalette()
   const intent=closeIntent.value;closeIntent.value=undefined
-  dirty.value=false;window.kamucl.send('window:skinEditorDirty',false);emit('close')
-  if(intent?.kind==='quit')window.kamucl.send('window:skinEditorQuit');else if(intent?.kind==='window')window.kamucl.send('window:close');else if(intent?.kind==='navigate')store.currentView=intent.destination
+  dirty.value=false;window.tangyuancl.send('window:skinEditorDirty',false);emit('close')
+  if(intent?.kind==='quit')window.tangyuancl.send('window:skinEditorQuit');else if(intent?.kind==='window')window.tangyuancl.send('window:close');else if(intent?.kind==='navigate')store.currentView=intent.destination
 }
 async function saveClose(){if(await save() && closeIntent.value)await finishClose()}
 function selectView(view:typeof views[number]){if(!blocked.value){endGesture();selectedView.value=view.name;viewer.value?.view(view.yaw,view.pitch)}}
@@ -139,9 +139,9 @@ function keys(event:KeyboardEvent){
 watch([tool,color,alpha],()=>viewer.value?.finishGesture(),{flush:'sync'})
 let restoringView=false
 watch(()=>store.currentView,(next,old)=>{if(restoringView||next===old||!(dirty.value||busy.value||finishingClose.value))return;restoringView=true;store.currentView=old;restoringView=false;requestClose({kind:'navigate',destination:next})},{flush:'sync'})
-watch(dirty,value=>window.kamucl.send('window:skinEditorDirty',value),{flush:'sync'})
-const offClose=window.kamucl.on('window:skinEditorClose',(data:any)=>requestClose({kind:data?.quit===true?'quit':'window'}))
-onBeforeUnmount(()=>{endGesture();disposed=true;contentResize?.disconnect();clearTimeout(paletteTimer);void flushPalette();offClose();window.kamucl.send('window:skinEditorDirty',false);window.kamucl.send('window:skinEditorBusy',{ownerId,pending:false})})
+watch(dirty,value=>window.tangyuancl.send('window:skinEditorDirty',value),{flush:'sync'})
+const offClose=window.tangyuancl.on('window:skinEditorClose',(data:any)=>requestClose({kind:data?.quit===true?'quit':'window'}))
+onBeforeUnmount(()=>{endGesture();disposed=true;contentResize?.disconnect();clearTimeout(paletteTimer);void flushPalette();offClose();window.tangyuancl.send('window:skinEditorDirty',false);window.tangyuancl.send('window:skinEditorBusy',{ownerId,pending:false})})
 </script>
 
 <template>

@@ -4,7 +4,7 @@ import type { ReleaseInfo } from '../../shared/types'
 
 /** 测试覆盖只能用于开发进程，且必须同时指定独立数据目录和模拟 API。 */
 export function isolatedUpdateTest(): boolean {
-  return app?.isPackaged !== true && !!process.env.KAMUCL_USERDATA_DIR && !!process.env.KAMUCL_UPDATE_API_BASE
+  return app?.isPackaged !== true && !!process.env.TANGYUANCL_USERDATA_DIR && !!process.env.TANGYUANCL_UPDATE_API_BASE
 }
 
 export function trustedUpdateRelease(release: ReleaseInfo | undefined): boolean {

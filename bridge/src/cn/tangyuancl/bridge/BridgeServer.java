@@ -1,4 +1,4 @@
-package cn.kamucl.bridge;
+package cn.tangyuancl.bridge;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,8 +23,8 @@ import java.util.concurrent.FutureTask;
 
 /**
  * 桥接 HTTP 服务：仅监听 127.0.0.1 随机端口，启动时生成一次性 token 写入
- * 游戏目录 .kamucl-bridge.json（启动器读取发现）。所有写操作必须携带
- * X-Kamucl-Token 头。启动器关闭或通信断开不影响游戏运行。
+ * 游戏目录 .tangyuancl-bridge.json（启动器读取发现）。所有写操作必须携带
+ * X-Tangyuancl-Token 头。启动器关闭或通信断开不影响游戏运行。
  */
 public final class BridgeServer {
     public static final int PROTOCOL = 1;
@@ -35,22 +35,22 @@ public final class BridgeServer {
     public static void start(Path gameDir, String modVersion) throws IOException {
         String token = newToken();
         HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-        server.createContext("/kamucl/v1/ping", exchange -> respond(exchange, null, () -> Map.of("ok", true, "protocol", PROTOCOL)));
-        server.createContext("/kamucl/v1/manifest", exchange -> respond(exchange, null, BridgeServer::manifest));
-        server.createContext("/kamucl/v1/set", exchange -> respond(exchange, token, () -> setParam(exchange)));
-        server.createContext("/kamucl/v1/reset", exchange -> respond(exchange, token, () -> resetParam(exchange)));
+        server.createContext("/tangyuancl/v1/ping", exchange -> respond(exchange, null, () -> Map.of("ok", true, "protocol", PROTOCOL)));
+        server.createContext("/tangyuancl/v1/manifest", exchange -> respond(exchange, null, BridgeServer::manifest));
+        server.createContext("/tangyuancl/v1/set", exchange -> respond(exchange, token, () -> setParam(exchange)));
+        server.createContext("/tangyuancl/v1/reset", exchange -> respond(exchange, token, () -> resetParam(exchange)));
         // HttpServer's dispatcher inherits daemon status from the thread calling
         // start(). Starting on Fabric's render thread kept the JVM alive after
         // Minecraft returned from main (Client shutdown from post-main watchdog).
         // A shutdown hook alone cannot fix that: the JVM never reaches shutdown.
         ExecutorService requests = Executors.newSingleThreadExecutor(task -> {
-            Thread thread = new Thread(task, "kamucl-bridge-request");
+            Thread thread = new Thread(task, "tangyuancl-bridge-request");
             thread.setDaemon(true);
             return thread;
         });
         server.setExecutor(requests);
         FutureTask<Void> start = new FutureTask<>(() -> { server.start(); return null; });
-        Thread bootstrap = new Thread(start, "kamucl-bridge-start");
+        Thread bootstrap = new Thread(start, "tangyuancl-bridge-start");
         bootstrap.setDaemon(true);
         bootstrap.start();
         try {
@@ -68,10 +68,10 @@ public final class BridgeServer {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             requests.shutdownNow();
             server.stop(0);
-        }, "kamucl-bridge-stop"));
+        }, "tangyuancl-bridge-stop"));
         int port = server.getAddress().getPort();
         writeDiscovery(gameDir, port, token, modVersion);
-        System.out.println("[KAMUCL Bridge] 桥接服务已就绪，端口 " + port + "（仅本机，需 token）");
+        System.out.println("[TangYuanCL Bridge] 桥接服务已就绪，端口 " + port + "（仅本机，需 token）");
     }
 
     private static String newToken() {
@@ -91,7 +91,7 @@ public final class BridgeServer {
         discovery.put("pid", ProcessHandle.current().pid());
         discovery.put("startedAt", System.currentTimeMillis());
         try {
-            Files.writeString(gameDir.resolve(".kamucl-bridge.json"), GSON.toJson(discovery), StandardCharsets.UTF_8);
+            Files.writeString(gameDir.resolve(".tangyuancl-bridge.json"), GSON.toJson(discovery), StandardCharsets.UTF_8);
         } catch (IOException ignored) { /* 发现文件写失败时启动器无法接入，不影响游戏 */ }
     }
 
@@ -168,7 +168,7 @@ public final class BridgeServer {
                 json(exchange, 403, Map.of("ok", false, "error", "仅限本机访问"));
                 return;
             }
-            if (expectedToken != null && !expectedToken.equals(exchange.getRequestHeaders().getFirst("X-Kamucl-Token"))) {
+            if (expectedToken != null && !expectedToken.equals(exchange.getRequestHeaders().getFirst("X-Tangyuancl-Token"))) {
                 json(exchange, 401, Map.of("ok", false, "error", "身份校验失败：缺少或错误的 token"));
                 return;
             }

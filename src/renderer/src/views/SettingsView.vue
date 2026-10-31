@@ -41,7 +41,7 @@ const page = ref<HTMLElement | null>(null)
 const vFocus = { mounted: (el: HTMLElement) => el.focus() }
 const settingsQuery = ref('')
 const searchMatches = computed(() => searchSettings(settingsQuery.value))
-const savedCategory = sessionStorage.getItem('kamucl.settings.category')
+const savedCategory = sessionStorage.getItem('tangyuancl.settings.category')
 const category = ref<SettingsCategory>(settingsCategories.find(c => c.id === savedCategory)?.id ?? 'appearance')
 const scope = computed(() => scopeOfCategory(category.value))
 const visibleCategories = computed(() => settingsCategories.filter(c => c.scope === scope.value))
@@ -54,7 +54,7 @@ function scroller() { return page.value?.querySelector<HTMLElement>('.settings-b
 async function selectCategory(id: SettingsCategory) {
   const ticket = ++navigation
   const scroll = scroller(); positions.set(category.value, scroll?.scrollTop ?? 0)
-  category.value = id; lastCategories[scopeOfCategory(id)] = id; settingsQuery.value = ''; sessionStorage.setItem('kamucl.settings.category', id)
+  category.value = id; lastCategories[scopeOfCategory(id)] = id; settingsQuery.value = ''; sessionStorage.setItem('tangyuancl.settings.category', id)
   await nextTick()
   if (ticket === navigation && scroll) scroll.scrollTop = Math.min(positions.get(id) ?? 0, Math.max(0, scroll.scrollHeight-scroll.clientHeight))
 }
@@ -155,7 +155,7 @@ function confirmRollback() {
   store.updatePrompt = { release, rollback: true }
 }
 function releaseSummary(body: string): string {
-  const first = (body || '').split(/\r?\n/).map((s) => s.replace(/^(?:#+|[-*])\s*/, '').trim()).filter(s => s && !/^KAMUCL\s+v?[\d.]+$/i.test(s))[0] ?? ''
+  const first = (body || '').split(/\r?\n/).map((s) => s.replace(/^(?:#+|[-*])\s*/, '').trim()).filter(s => s && !/^TangYuanCL\s+v?[\d.]+$/i.test(s))[0] ?? ''
   return first.length > 60 ? first.slice(0, 60) + '…' : first
 }
 function releaseDate(value: string): string {
@@ -1024,7 +1024,7 @@ async function onRemovePlugin(p: PluginInfo) {
         <div class="card group group-inline">
           <div>
             <h3 class="group-title">启动后关闭启动器</h3>
-            <p class="muted group-hint">游戏成功启动后自动退出 KAMUCL</p>
+            <p class="muted group-hint">游戏成功启动后自动退出 TangYuanCL</p>
           </div>
           <label class="switch">
             <input data-ui="SettingsView:f2f1ffcd2e84"
@@ -1056,20 +1056,23 @@ async function onRemovePlugin(p: PluginInfo) {
           </summary>
           <div class="collapse-body">
             <label class="download-setting download-setting-col">
-              <span>Client ID<small class="muted">（选填；未配置时无法使用微软正版登录）</small></span>
+              <span>Client ID<small class="muted">（默认已内置，开箱即用；可选填自注册 ID 覆盖）</small></span>
               <input data-ui="SettingsView:ms-client-id-input"
                 class="input mono"
                 type="password"
                 :value="store.settings.msClientId ?? ''"
-                placeholder="留空 = 未配置，登录会提示先注册应用"
+                placeholder="留空 = 使用内置默认 ID（推荐）"
                 @change="save({ msClientId: ($event.target as HTMLInputElement).value.trim() })"
               />
             </label>
             <p class="muted group-hint">
-              KAMUCL 不内置任何第三方客户端 ID。请到
+              默认使用 Minecraft 官方启动器的公共客户端 ID（开源启动器社区通用做法，
+              Prism Launcher / MultiMC / ATLauncher / HMCL 等均内置此 ID），
+              <strong>无需注册即可直接登录</strong>。授权页显示的应用名称为「Minecraft」。
+              如需授权页显示自定义应用名称，可到
               <a class="upd-link" href="https://portal.azure.com/" target="_blank" rel="noreferrer">portal.azure.com</a>
-              免费注册自己的应用（支持「允许公共客户端流」的移动/桌面应用，账户类型选「个人 Microsoft 账户」），
-              把 Application (client) ID 粘贴到上方后再使用微软登录。授权页将显示你自己的应用名称，Token 只流向本启动器。
+              注册自己的应用（支持「允许公共客户端流」，账户类型选「个人 Microsoft 账户」），
+              将 Application (client) ID 粘贴到上方覆盖默认值。
             </p>
           </div>
         </details>
@@ -1141,7 +1144,7 @@ async function onRemovePlugin(p: PluginInfo) {
           </div>
           </details>
           <p class="muted group-hint">
-            更新包发布在 GitHub Releases；下载较慢时可到 KAMUCL 内测群（{{ store.settings.qqGroupNumber?.trim() || QQ_GROUP_NUMBER }}）获取，群内文件与 GitHub 版本一致。
+            更新包发布在 GitHub Releases；下载较慢时可到 TangYuanCL 内测群（{{ store.settings.qqGroupNumber?.trim() || QQ_GROUP_NUMBER }}）获取，群内文件与 GitHub 版本一致。
           </p>
         </div>
       </details>

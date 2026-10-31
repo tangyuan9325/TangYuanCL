@@ -9,13 +9,13 @@ const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')
 
 export default defineConfig({
   main: {
-    plugins: [{ name: 'kamucl-native-material', closeBundle() {
+    plugins: [{ name: 'tangyuancl-native-material', closeBundle() {
       execFileSync(process.execPath, [resolve(__dirname, 'scripts/build-mod-worker.cjs')], { stdio: 'inherit', windowsHide: true })
       execFileSync(process.execPath, [resolve(__dirname, 'scripts/build-native.cjs')], { stdio: 'inherit', windowsHide: true })
       // 内置桥接 MOD：随启动器分发，面板可一键装入实例 mods 目录
-      const bridgeJar = resolve(__dirname, 'bridge/dist/kamucl-bridge-1.0.1.jar')
-      if (existsSync(bridgeJar)) copyFileSync(bridgeJar, resolve(__dirname, 'out/main/kamucl-bridge.jar'))
-      else throw new Error('[kamucl] bridge/dist/kamucl-bridge-1.0.1.jar missing; run node scripts/build-bridge.cjs')
+      const bridgeJar = resolve(__dirname, 'bridge/dist/tangyuancl-bridge-1.0.1.jar')
+      if (existsSync(bridgeJar)) copyFileSync(bridgeJar, resolve(__dirname, 'out/main/tangyuancl-bridge.jar'))
+      else throw new Error('[tangyuancl] bridge/dist/tangyuancl-bridge-1.0.1.jar missing; run node scripts/build-bridge.cjs')
     } }],
     build: {
       outDir: 'out/main',

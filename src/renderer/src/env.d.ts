@@ -10,7 +10,7 @@ declare module '*.vue' {
 }
 
 /** preload 暴露给渲染进程的桥接 API */
-interface KamuclBridge {
+interface TangyuanclBridge {
   invoke: (channel: string, ...args: unknown[]) => Promise<unknown>
   on: (channel: string, cb: (...args: unknown[]) => void) => () => void
   send: (channel: string, ...args: unknown[]) => void
@@ -19,8 +19,8 @@ interface KamuclBridge {
 }
 
 interface Window {
-  kamucl: KamuclBridge
-  kamuclSplash: {
+  tangyuancl: TangyuanclBridge
+  tangyuanclSplash: {
     ready(): void
     assembled(): void
     finished(): void

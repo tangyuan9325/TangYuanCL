@@ -33,7 +33,7 @@ export type ProgressEmit = (e: ProgressEvent) => void
 
 const errText = (e: unknown): string => (e instanceof Error ? e.message : String(e))
 
-const UA = { 'User-Agent': 'KAMUCL/0.4.0' }
+const UA = { 'User-Agent': 'TangYuanCL/0.4.0' }
 const TIMEOUT = 30000
 const requestSignal=new AsyncLocalStorage<AbortSignal>()
 export const withCommunitySignal=<T>(signal:AbortSignal|undefined,run:()=>Promise<T>):Promise<T>=>signal?requestSignal.run(signal,run):run()
@@ -192,7 +192,7 @@ import { CF_BUILTIN_KEY } from './curseforgeKey'
 
 /** 当前生效的 CurseForge 通道：有 key（用户设置 > 内置默认）走官方；仅内置失效时才落镜像 */
 export function cfChannel(): { base: string; official: boolean; key: string } {
-  const key = (process.env.KAMUCL_CF_API_KEY || getSettings().curseforgeApiKey?.trim() || CF_BUILTIN_KEY).trim()
+  const key = (process.env.TANGYUANCL_CF_API_KEY || getSettings().curseforgeApiKey?.trim() || CF_BUILTIN_KEY).trim()
   return key ? { base: CF_OFFICIAL, official: true, key } : { base: CF_MIRROR, official: false, key: '' }
 }
 
@@ -553,7 +553,7 @@ export async function communityDownload(
     getSettings().downloadThreads, getSettings().mirror, signal)
 
   if (target.kind === 'modpack') {
-    const tmpPath = path.join(os.tmpdir(), `kamucl-pack-${Date.now()}-${fileName}`)
+    const tmpPath = path.join(os.tmpdir(), `tangyuancl-pack-${Date.now()}-${fileName}`)
     await transfer(tmpPath)
     // 动态 import 避免与 modpacks.ts 的循环依赖；后台异步安装，进度走 event:progress
     const { installModpack } = await import('./modpacks')

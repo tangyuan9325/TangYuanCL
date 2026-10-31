@@ -8,7 +8,7 @@ import { mcVersionAtLeast } from '../../shared/keybindings'
 
 const root = () => path.join(app.getPath('userData'), 'default-resourcepacks')
 const manifest = () => path.join(root(), 'packs.json')
-const managedName = (p: DefaultResourcePack) => `KAMUCL-default-${p.id}-${p.name}`
+const managedName = (p: DefaultResourcePack) => `TangYuanCL-default-${p.id}-${p.name}`
 function save(packs: DefaultResourcePack[]): DefaultResourcePack[] {
   fs.mkdirSync(root(), { recursive: true })
   fs.writeFileSync(manifest() + '.tmp', JSON.stringify(packs, null, 2))
@@ -107,7 +107,7 @@ export function resourcePackIncompatible(pack: any, target: PackFormat | null): 
 
 export function syncDefaultResourcePacks(gameDir: string, mcVersion: string, clientJar?: string): number {
   if (!mcVersionAtLeast(mcVersion, '1.6')) return 0
-  const allPacks = getDefaultResourcePacks(), packs = allPacks.filter(p => p.enabled), stateFile = path.join(gameDir, '.kamucl-default-resourcepacks.json')
+  const allPacks = getDefaultResourcePacks(), packs = allPacks.filter(p => p.enabled), stateFile = path.join(gameDir, '.tangyuancl-default-resourcepacks.json')
   let previous: string[] = []
   try { const raw = JSON.parse(fs.readFileSync(stateFile, 'utf8')); if (Array.isArray(raw)) previous = raw.filter(x => typeof x === 'string') } catch { /* 首次同步 */ }
   if (!allPacks.length && !previous.length) return 0

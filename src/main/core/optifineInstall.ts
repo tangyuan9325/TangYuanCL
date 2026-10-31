@@ -22,7 +22,7 @@ import type { ProgressEmit } from './loaders'
 import { logScope } from './launcherLog'
 
 const log = logScope('optifine')
-const STAGING = path.join(os.tmpdir(), 'kamucl-optifine')
+const STAGING = path.join(os.tmpdir(), 'tangyuancl-optifine')
 
 export type { OptiFineInstallResult } from '../../shared/types'
 import type { OptiFineInstallResult } from '../../shared/types'
@@ -45,7 +45,7 @@ function findCreatedVersion(target: string, before: Set<string>, entry: OptiFine
   // 兼容重复安装：目标目录已存在时，按官方命名约定回退
   const guess = `optifine_${entry.mcVersion}_${entry.edition.replace(/\s+/g, '_')}`
   if (listVersions(target).has(guess)) return guess
-  throw new Error(`安装器未生成 OptiFine 版本（新增目录：${created.join('、') || '无'}），详见 kamucl-logs/installer.log`)
+  throw new Error(`安装器未生成 OptiFine 版本（新增目录：${created.join('、') || '无'}），详见 tangyuancl-logs/installer.log`)
 }
 
 /**

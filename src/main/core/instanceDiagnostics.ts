@@ -43,7 +43,7 @@ export async function diagnoseInstance(target:InstanceTarget,signal?:AbortSignal
   const context=selectDiagnosticSession(target.id,c.dir,[...(latest?[latest]:[]),...hist.map(e=>e.context!)])
   let session:string|undefined
   if(context?.logDir&&context.startedAt){session=String(context.startedAt);const logDir=String(context.logDir);let text='';for(const name of ['stdout.log','stderr.log'])try{const f=await safePath(logDir,name);text+='\n'+await tail(f)}catch{};findings.push(...analyzeDiagnosticText(text))}
-  else findings.push({rule:'no-session',title:'暂无启动日志（属正常状态，非异常）',confidence:'unknown',evidence:'本实例尚未通过 KAMUCL 启动过，因此没有可分析的启动日志；此条为环境检查结果的说明，不代表存在故障。',advice:'这是首次诊断的正常提示，无需处理。若之后启动失败，再运行诊断即可看到对应会话的原因。'})
+  else findings.push({rule:'no-session',title:'暂无启动日志（属正常状态，非异常）',confidence:'unknown',evidence:'本实例尚未通过 TangYuanCL 启动过，因此没有可分析的启动日志；此条为环境检查结果的说明，不代表存在故障。',advice:'这是首次诊断的正常提示，无需处理。若之后启动失败，再运行诊断即可看到对应会话的原因。'})
   // 游戏自身崩溃时，关键成因只写在 crash-reports/*.txt 里，启动日志不一定包含；
   // 与日志结论去重后合并，避免同一原因重复展示。
   try{for(const f of await analyzeInstanceCrashes(c.dir,session))if(!findings.some(x=>x.rule===f.rule))findings.push(f)}catch{/* 崩溃报告不可读不影响其余诊断 */}

@@ -66,12 +66,12 @@ function confirmGpuDraw(){
 function retryPreview(){if(disposed)return;persistError.value='';useSoftware('manual software preview retry')}
 let hits:string[]=[],batch:MascotBatch|undefined,flight:Promise<void>|undefined,saveTimer:ReturnType<typeof setTimeout>|undefined,retryTimer:ReturnType<typeof setTimeout>|undefined,retryDelay=800,soundRevision=0,savedSoundRevision=0
 const unsaved=()=>!!batch||!!hits.length||soundRevision!==savedSoundRevision
-function reportPending(){const pending=unsaved()||interaction.busy;if(pending!==reported){reported=pending;window.kamucl.send('window:mascotPending',pending)}}
+function reportPending(){const pending=unsaved()||interaction.busy;if(pending!==reported){reported=pending;window.tangyuancl.send('window:mascotPending',pending)}}
 async function save():Promise<void>{
  if(flight)return flight
  flight=(async()=>{while(unsaved()){
-  if(batch||hits.length){batch??={batchId:crypto.randomUUID(),hits:hits.splice(0,512)};await window.kamucl.invoke('mascots:batch',batch);batch=undefined}
-  else{const revision=soundRevision,prefs={...sound.value};await window.kamucl.invoke('mascots:sound',prefs);savedSoundRevision=revision}
+  if(batch||hits.length){batch??={batchId:crypto.randomUUID(),hits:hits.splice(0,512)};await window.tangyuancl.invoke('mascots:batch',batch);batch=undefined}
+  else{const revision=soundRevision,prefs={...sound.value};await window.tangyuancl.invoke('mascots:sound',prefs);savedSoundRevision=revision}
  }persistError.value='';retryDelay=800})().catch(error=>{persistError.value=errText(error);throw error}).finally(()=>{
   flight=undefined;reportPending();if(unsaved()&&!disposed){clearTimeout(retryTimer);retryTimer=setTimeout(()=>void save().catch(()=>{}),retryDelay);retryDelay=Math.min(8000,retryDelay*2)}
  });return flight
@@ -81,12 +81,12 @@ function recordContacts(contacts:number[],now:number){for(const contact of conta
 async function drain(){while(interaction.busy&&!disposed){if(!supported.value)throw new Error('互动预览不可用，请重试预览后保存');if(hidden.value){const now=performance.now();interaction.resume(now);recordContacts(interaction.advance(now+10000,reduced.value).contacts,now+10000);interaction.pause(now);busy.value=interaction.busy;reportPending()}else{wake();await new Promise<void>(resolve=>setTimeout(resolve,16))}}}
 async function flush(){const wasClosing=closing.value;closing.value=true;try{await drain();clearTimeout(saveTimer);saveTimer=undefined;clearTimeout(retryTimer);await save()}finally{closing.value=wasClosing}}
 async function closeStage(){if(closing.value)return;closing.value=true;try{await flush();emit('close')}catch(error){toast('互动次数尚未保存：'+errText(error),'error')}finally{closing.value=false}}
-async function closeWindow(quit=false){if(closing.value)return;closing.value=true;try{await flush();window.kamucl.send(quit?'window:mascotQuit':'window:close')}catch(error){toast('互动次数尚未保存，关闭已暂停：'+errText(error),'error')}finally{closing.value=false}}
-const unsubscribe=window.kamucl.on('window:mascotClose',payload=>void closeWindow((payload as {quit?:boolean}|undefined)?.quit===true))
+async function closeWindow(quit=false){if(closing.value)return;closing.value=true;try{await flush();window.tangyuancl.send(quit?'window:mascotQuit':'window:close')}catch(error){toast('互动次数尚未保存，关闭已暂停：'+errText(error),'error')}finally{closing.value=false}}
+const unsubscribe=window.tangyuancl.on('window:mascotClose',payload=>void closeWindow((payload as {quit?:boolean}|undefined)?.quit===true))
 function slap(){if(!ready.value||hidden.value||closing.value||confirmReset.value)return;void audio.unlock();if(!interaction.accept(performance.now())){toast('拍打队列已满，请稍候');return}busy.value=true;reportPending();wake()}
 function keyDown(event:KeyboardEvent){if(event.key===' '||event.key==='Enter'){event.preventDefault();if(!event.repeat)slap()}}
 function soundChanged(value:Partial<{muted:boolean;volume:number}>){state.value.sound=normalizeMascotSound({...sound.value,...value});soundRevision++;audio.update();void audio.unlock();queueSave()}
-async function resetCounts(){try{await flush();state.value=await window.kamucl.invoke('mascots:reset',true,'kamu') as MascotState;confirmReset.value=false;menu.value=false;await nextTick(()=>menuButton.value?.focus())}catch(error){toast(errText(error),'error')}}
+async function resetCounts(){try{await flush();state.value=await window.tangyuancl.invoke('mascots:reset',true,'kamu') as MascotState;confirmReset.value=false;menu.value=false;await nextTick(()=>menuButton.value?.focus())}catch(error){toast(errText(error),'error')}}
 function closeMenu(){menu.value=false;confirmReset.value=false;void nextTick(()=>menuButton.value?.focus())}
 function wake(){if(!disposed&&!hidden.value&&player&&!frame)frame=requestAnimationFrame(render)}
 function render(rafTimestamp:number){
@@ -174,7 +174,7 @@ async function buildScene(){
 }
 watch(hidden,value=>{if(value){interaction.pause(performance.now());cancelAnimationFrame(frame);frame=0;cancelGpuReady();audio.pause();void save().catch(()=>{})}else{interaction.resume(performance.now());if(!ready.value)previousPose=undefined;void audio.unlock();wake()}},{flush:'sync'})
 watch(decorativeActive,wake);watch(reduced,wake)
-onMounted(async()=>{try{const initial=await window.kamucl.invoke('mascots:state') as MascotState;if(disposed)return;state.value=initial;await audio.unlock();if(disposed)return;await buildScene()}catch(error){if(!disposed){persistError.value=errText(error);toast(errText(error),'error')}}})
+onMounted(async()=>{try{const initial=await window.tangyuancl.invoke('mascots:state') as MascotState;if(disposed)return;state.value=initial;await audio.unlock();if(disposed)return;await buildScene()}catch(error){if(!disposed){persistError.value=errText(error);toast(errText(error),'error')}}})
 onUnmounted(()=>{disposed=true;cancelImage?.();cancelGpuReady();unsubscribe();clearTimeout(saveTimer);clearTimeout(retryTimer);cancelAnimationFrame(frame);batchRenderer?.dispose();player?.dispose();for(const texture of textures)texture.dispose();releaseGl();software?.dispose();software?.domElement.remove();void audio.dispose()})
 defineExpose({flush,closeStage})
 </script>

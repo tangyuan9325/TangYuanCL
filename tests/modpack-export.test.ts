@@ -8,7 +8,7 @@ import { buildModpackArchive } from '../src/main/core/modpackArchive'
 import { probeModpack } from '../src/main/core/modpacks'
 
 async function makeInstance(): Promise<string> {
-  const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'kamucl-pack-export-'))
+  const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'tangyuancl-pack-export-'))
   const write = async (rel: string, body: string | Buffer) => {
     const file = path.join(root, rel)
     await fs.promises.mkdir(path.dirname(file), { recursive: true })
@@ -84,7 +84,7 @@ test('整合包导出：原版实例的依赖只有 Minecraft 版本', async (t)
 })
 
 test('整合包导出：空实例也能产出合法包，便于分享纯配置组合', async (t) => {
-  const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'kamucl-pack-empty-'))
+  const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'tangyuancl-pack-empty-'))
   t.after(() => fs.rmSync(root, { recursive: true, force: true }))
   const file = path.join(root, 'empty.mrpack')
   const result = await buildModpackArchive({ root, name: 'empty', mcVersion: '1.20.1' }, file)

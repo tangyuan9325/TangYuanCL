@@ -115,7 +115,7 @@ test('崩溃报告：空内容不产出结论', () => {
 })
 
 test('崩溃报告：按修改时间倒序列出，忽略非崩溃文件并遵守上限', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kamucl-crash-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tangyuancl-crash-'))
   try {
     const reports = path.join(dir, 'crash-reports')
     fs.mkdirSync(reports)
@@ -144,7 +144,7 @@ test('崩溃报告：按修改时间倒序列出，忽略非崩溃文件并遵�
 })
 
 test('崩溃报告：实例无 crash-reports 目录时返回空，不影响诊断', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kamucl-crash-none-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tangyuancl-crash-none-'))
   try {
     assert.deepEqual(await listCrashReports(dir), [])
     assert.deepEqual(await analyzeInstanceCrashes(dir, new Date().toISOString()), [])
@@ -154,7 +154,7 @@ test('崩溃报告：实例无 crash-reports 目录时返回空，不影响诊�
 })
 
 test('崩溃报告：诊断入口只分析最新一份并传递会话时间', async () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kamucl-crash-latest-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'tangyuancl-crash-latest-'))
   try {
     const reports = path.join(dir, 'crash-reports')
     fs.mkdirSync(reports)

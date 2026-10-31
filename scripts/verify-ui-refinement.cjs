@@ -1,11 +1,11 @@
 // Actual portable EXE GUI, with an isolated profile and loopback-only inspection.
 if (process.argv[2]) {
   if (!['black-orange', 'blue-white', 'custom'].includes(process.argv[2])) throw new Error('Unknown GUI theme argument')
-  process.env.KAMUCL_TEST_THEME = process.argv[2]
+  process.env.TANGYUANCL_TEST_THEME = process.argv[2]
 }
 const fs=require('fs'),path=require('path'),os=require('os'),net=require('net'),assert=require('assert/strict'),{spawn}=require('child_process');
-const version=require('../package.json').version,root=fs.mkdtempSync(path.join(os.tmpdir(),'KAMUCL EXE GUI 中文 ')),profile=path.join(root,'profile'),games=path.join(root,'games');
-fs.mkdirSync(profile);fs.mkdirSync(games);fs.writeFileSync(path.join(profile,'settings.json'),JSON.stringify({gameDir:games,activeFolder:games,folders:[{path:games,name:'独立验证目录',isDefault:true}],autoUpdate:false,theme:process.env.KAMUCL_TEST_THEME || 'black-orange'}));
+const version=require('../package.json').version,root=fs.mkdtempSync(path.join(os.tmpdir(),'TangYuanCL EXE GUI 中文 ')),profile=path.join(root,'profile'),games=path.join(root,'games');
+fs.mkdirSync(profile);fs.mkdirSync(games);fs.writeFileSync(path.join(profile,'settings.json'),JSON.stringify({gameDir:games,activeFolder:games,folders:[{path:games,name:'独立验证目录',isDefault:true}],autoUpdate:false,theme:process.env.TANGYUANCL_TEST_THEME || 'black-orange'}));
 const fixtureDir=path.join(games,'versions','联机验证实例');fs.mkdirSync(fixtureDir,{recursive:true});fs.writeFileSync(path.join(fixtureDir,'联机验证实例.json'),JSON.stringify({id:'联机验证实例',_mcVersion:'1.20.1',_loader:'fabric',_gameDir:true,mainClass:'net.fabricmc.loader.impl.launch.knot.KnotClient',libraries:[]}));fs.writeFileSync(path.join(fixtureDir,'联机验证实例.jar'),'fixture-only-no-launch');
 fs.writeFileSync(path.join(profile,'servers.json'),JSON.stringify([{id:'one',name:'普通服务器',address:'127.0.0.1:9',versionId:'联机验证实例',folder:games},{id:'two',name:'我收藏的服务器',address:'127.0.0.1:10',versionId:'联机验证实例',folder:games}]));
 const other=path.join(root,'second-games');fs.mkdirSync(other);
@@ -14,13 +14,13 @@ for(const [i,name] of ['26.3 Fabric 生存世界','Mecha Craftaleon 客户端 v1
 for(const folder of [games,other])for(const id of fs.readdirSync(path.join(folder,'versions'))){
   for(const rel of ['mods','resourcepacks','shaderpacks']){const dir=path.join(folder,'versions',id,rel);fs.mkdirSync(dir,{recursive:true});for(const name of ['Fabric API','Long display name for a resource with several words and 中文名称','Replay recording tools']){const zip=new(require('adm-zip'))();zip.addFile('fabric.mod.json',Buffer.from(JSON.stringify({schemaVersion:1,id:name.replace(/[^a-z]/gi,'').toLowerCase(),version:'1.0.0',name})));zip.addFile('pack.mcmeta',Buffer.from(JSON.stringify({pack:{pack_format:15,description:name}})));zip.writeZip(path.join(dir,name+(rel==='mods'?'.jar':'.zip')))}}
 }
-const exe=process.env.KAMUCL_GUI_APP||path.join(root,`KAMUCL-${version}.exe`);if(!process.env.KAMUCL_GUI_DEV&&!process.env.KAMUCL_GUI_APP)fs.copyFileSync(`release/KAMUCL-${version}.exe`,exe);
+const exe=process.env.TANGYUANCL_GUI_APP||path.join(root,`TangYuanCL-${version}.exe`);if(!process.env.TANGYUANCL_GUI_DEV&&!process.env.TANGYUANCL_GUI_APP)fs.copyFileSync(`release/TangYuanCL-${version}.exe`,exe);
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{
  const server=net.createServer();await new Promise(r=>server.listen(0,'127.0.0.1',r));const port=server.address().port;await new Promise(r=>server.close(r));
  const mainServer=net.createServer();await new Promise(r=>mainServer.listen(0,'127.0.0.1',r));const mainPort=mainServer.address().port;await new Promise(r=>mainServer.close(r));
  const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;const log=fs.openSync(path.join(root,'process.log'),'w');
- const child=spawn(process.env.KAMUCL_GUI_DEV ? path.resolve('node_modules/electron/dist/electron.exe') : exe,[...(process.env.KAMUCL_GUI_DEV ? ['.'] : []),...(process.env.KAMUCL_GUI_SOFTWARE==='1'?['--use-gl=angle','--use-angle=swiftshader']:[]),`--inspect=127.0.0.1:${mainPort}`,'--disable-backgrounding-occluded-windows','--disable-renderer-backgrounding','--disable-background-timer-throttling',`--user-data-dir=${profile}`,`--remote-debugging-port=${port}`],{env,stdio:['ignore',log,log]});let ws,mainWs;
+ const child=spawn(process.env.TANGYUANCL_GUI_DEV ? path.resolve('node_modules/electron/dist/electron.exe') : exe,[...(process.env.TANGYUANCL_GUI_DEV ? ['.'] : []),...(process.env.TANGYUANCL_GUI_SOFTWARE==='1'?['--use-gl=angle','--use-angle=swiftshader']:[]),`--inspect=127.0.0.1:${mainPort}`,'--disable-backgrounding-occluded-windows','--disable-renderer-backgrounding','--disable-background-timer-throttling',`--user-data-dir=${profile}`,`--remote-debugging-port=${port}`],{env,stdio:['ignore',log,log]});let ws,mainWs;
  try {
   let page;for(let i=0;i<90;i++){assert(child.exitCode===null,'portable exited before UI');try{page=(await(await fetch(`http://127.0.0.1:${port}/json`)).json()).find(p=>p.url.includes('/renderer/index.html'));if(page)break}catch{}await wait(1000)}assert(page,'renderer unavailable');
   ws=new WebSocket(page.webSocketDebuggerUrl);await new Promise((r,j)=>{ws.addEventListener('open',r,{once:true});ws.addEventListener('error',j,{once:true})});let id=0;const pending=new Map();ws.addEventListener('message',e=>{const m=JSON.parse(e.data);pending.get(m.id)?.(m);if(m.method==='Runtime.exceptionThrown'||m.method==='Runtime.consoleAPICalled'&&m.params.type==='error')console.error(JSON.stringify(m.params))});
@@ -40,7 +40,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   mainWs=new WebSocket(mainPage.webSocketDebuggerUrl);await new Promise(r=>mainWs.addEventListener('open',r,{once:true}));let mid=0;const mp=new Map();mainWs.addEventListener('message',e=>{const m=JSON.parse(e.data);mp.get(m.id)?.(m)});
   const main=expression=>new Promise((resolve,reject)=>{const n=++mid,t=setTimeout(()=>reject(Error('Main inspection timeout')),10000);mp.set(n,m=>{clearTimeout(t);mp.delete(n);m.result?.exceptionDetails?reject(Error(JSON.stringify(m.result.exceptionDetails))):resolve(m.result?.result?.value)});mainWs.send(JSON.stringify({id:n,method:'Runtime.evaluate',params:{expression,returnByValue:true,awaitPromise:true}}))});
 
-  const shotDir=path.resolve('release/ui-refinement-'+(process.env.KAMUCL_TEST_THEME||'black-orange'));fs.mkdirSync(shotDir,{recursive:true});
+  const shotDir=path.resolve('release/ui-refinement-'+(process.env.TANGYUANCL_TEST_THEME||'black-orange'));fs.mkdirSync(shotDir,{recursive:true});
   fs.writeFileSync('out/ui-live.json',JSON.stringify({root,port,mainPort,pid:child.pid,shotDir}));
   const skinFixture = await evaluate("(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');g.fillStyle='#49a595';g.fillRect(0,0,64,64);g.fillStyle='#a07856';g.fillRect(8,8,8,8);return c.toDataURL()})()");
   await main(`globalThis.testElectron=process.mainModule.require('electron');globalThis.uiSkin=${JSON.stringify(skinFixture)};globalThis.uiAccount={id:'ui-fixture',type:'microsoft',username:'界面验证账户',uuid:'00000000000000000000000000000001'};for(const [channel,handler] of [['accounts:selected',()=>uiAccount],['accounts:list',()=>[uiAccount]],['skin:profile',()=>({username:uiAccount.username,skins:[{id:'fixture',variant:'classic',dataUrl:uiSkin,url:''}],capes:[]})],['skin:history',()=>[]],['skin:avatar',()=>uiSkin]]){testElectron.ipcMain.removeHandler(channel);testElectron.ipcMain.handle(channel,handler)}`);
@@ -51,8 +51,8 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
     const nativeFocus=await main(`(()=>{const w=testElectron.BrowserWindow.getAllWindows()[0],before={focused:w.isFocused(),visible:w.isVisible(),hidden:testElectron.app.isHidden()};testElectron.app.focus({steal:true});w.show();w.focus();return{before,after:{focused:w.isFocused(),visible:w.isVisible(),hidden:testElectron.app.isHidden()}}})()`);
     await wait(250);fs.writeFileSync('out/native-gui-focus-live.json',JSON.stringify({source:'actual disposable macOS NSApp activation and BrowserWindow focus; no system preferences changed',...nativeFocus},null,2));
   }
-  assert.equal(await evaluate('document.documentElement.dataset.theme'),process.env.KAMUCL_TEST_THEME||'black-orange','requested theme must actually apply');
-  const screenshot=async name=>{await wait(220);fs.writeFileSync(path.join(shotDir,name+'.png'),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'));if(process.env.KAMUCL_STABLE_NAV_PROOF==='1'&&/gallery-118-themed-rows|community-118-favorites/.test(name)){await wait(1800);const state=await evaluate("({now:performance.now(),view:document.querySelector('.nav-item.active')?.dataset.nav,transitions:document.querySelector('nav')?.getAnimations({subtree:true}).filter(a=>a.playState==='running').map(a=>({state:a.playState,currentTime:a.currentTime})),items:[...document.querySelectorAll('.nav-item')].map(e=>({text:e.innerText,box:{top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom},opacity:getComputedStyle(e).opacity}))})");fs.writeFileSync(path.join(shotDir,name+'-settled.json'),JSON.stringify(state,null,2));fs.writeFileSync(path.join(shotDir,name+'-settled.png'),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'))}};
+  assert.equal(await evaluate('document.documentElement.dataset.theme'),process.env.TANGYUANCL_TEST_THEME||'black-orange','requested theme must actually apply');
+  const screenshot=async name=>{await wait(220);fs.writeFileSync(path.join(shotDir,name+'.png'),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'));if(process.env.TANGYUANCL_STABLE_NAV_PROOF==='1'&&/gallery-118-themed-rows|community-118-favorites/.test(name)){await wait(1800);const state=await evaluate("({now:performance.now(),view:document.querySelector('.nav-item.active')?.dataset.nav,transitions:document.querySelector('nav')?.getAnimations({subtree:true}).filter(a=>a.playState==='running').map(a=>({state:a.playState,currentTime:a.currentTime})),items:[...document.querySelectorAll('.nav-item')].map(e=>({text:e.innerText,box:{top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom},opacity:getComputedStyle(e).opacity}))})");fs.writeFileSync(path.join(shotDir,name+'-settled.json'),JSON.stringify(state,null,2));fs.writeFileSync(path.join(shotDir,name+'-settled.png'),Buffer.from((await call('Page.captureScreenshot',{format:'png'})).data,'base64'))}};
   const click=async selector=>{
     let state;
     for(let i=0;i<50;i++){
@@ -73,9 +73,9 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
     }
     assert(ready,'Navigation did not select '+id+': '+JSON.stringify(state));await wait(350);
   };
-  if(process.env.KAMUCL_EXTENSION_GUI){
+  if(process.env.TANGYUANCL_EXTENSION_GUI){
     const recordScreencast=async(name,action,duration=2200)=>{
-      const directory=path.resolve('out',name+'-'+(process.env.KAMUCL_TEST_THEME||'black-orange'));fs.mkdirSync(directory,{recursive:true});const frames=[],buffers=[],startedAt=Date.now();let nextAck=900000;
+      const directory=path.resolve('out',name+'-'+(process.env.TANGYUANCL_TEST_THEME||'black-orange'));fs.mkdirSync(directory,{recursive:true});const frames=[],buffers=[],startedAt=Date.now();let nextAck=900000;
       // Acknowledge before decoding or disk I/O so the capture consumer cannot
       // throttle the native compositor; persist the original frames afterwards.
       const listener=e=>{const message=JSON.parse(e.data);if(message.method!=='Page.screencastFrame')return;const frame=message.params,index=frames.length,file='frame-'+String(index).padStart(4,'0')+'.jpg';ws.send(JSON.stringify({id:++nextAck,method:'Page.screencastFrameAck',params:{sessionId:frame.sessionId}}));frames.push({file,receivedAt:Date.now(),...frame.metadata});buffers.push(Buffer.from(frame.data,'base64'))};
@@ -88,8 +88,8 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
       const intervals=frames.slice(1).map((frame,index)=>frame.timestamp-frames[index].timestamp),elapsed=frames.length>1?frames.at(-1).timestamp-frames[0].timestamp:0,result={version,directory,capture,source:'actual Page.startScreencast full compositor frames scaled to fit 960x620, JPEG quality70, acknowledged before decode and buffered in memory until recording stops; no interpolated frames',startedAt:new Date(startedAt).toISOString(),frames,elapsed,fps:elapsed?(frames.length-1)/elapsed:0,intervals};fs.writeFileSync(path.join(directory,'recording.json'),JSON.stringify(result,null,2));return result;
     };
     const harness={call,evaluate,main,click,nav,screenshot,wait,root,profile,games,other,version,recordScreencast};
-    if(!process.env.KAMUCL_SKIP_EXTENSION_BASE)await require('./verify-extension-ui.cjs')(harness);
-    const selectedModule=process.env.KAMUCL_UI_MODULE||process.env.KAMUCL_117_MODULE;
+    if(!process.env.TANGYUANCL_SKIP_EXTENSION_BASE)await require('./verify-extension-ui.cjs')(harness);
+    const selectedModule=process.env.TANGYUANCL_UI_MODULE||process.env.TANGYUANCL_117_MODULE;
     if(version==='1.1.9'&&selectedModule==='motion119')await require('./verify-kamu-motion-diagnostic-119.cjs')({...harness,motionDiagnosticInvocation:'standalone-cold-process'});
     // Run the unchanged motion gate before longer editing fixtures, so a native
     // failure yields render diagnostics without an unrelated earlier UI race.
@@ -105,10 +105,10 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   // Return the diagnostic response before destroying its renderer. Completion
   // still requires the actual owned process to exit cleanly; a lost CDP reply
   // from immediate destruction must not be mistaken for a failed close.
-  const closeApp=async()=>{if(process.platform==='darwin')await main('setTimeout(()=>testElectron.app.quit(),500)');mainWs.close();await wait(100);if(process.platform!=='darwin')await evaluate("setTimeout(()=>window.kamucl.send('window:close'),100); true");for(let i=0;i<100&&child.exitCode===null;i++)await wait(100);assert.equal(child.exitCode,0)};
-  if(process.env.KAMUCL_EXTENSION_ONLY){await closeApp();return}
+  const closeApp=async()=>{if(process.platform==='darwin')await main('setTimeout(()=>testElectron.app.quit(),500)');mainWs.close();await wait(100);if(process.platform!=='darwin')await evaluate("setTimeout(()=>window.tangyuancl.send('window:close'),100); true");for(let i=0;i<100&&child.exitCode===null;i++)await wait(100);assert.equal(child.exitCode,0)};
+  if(process.env.TANGYUANCL_EXTENSION_ONLY){await closeApp();return}
   // Reset renderer caches populated by extension fixtures before the original regression.
-  if(process.env.KAMUCL_EXTENSION_GUI){await call('Page.reload');await wait(2200)}
+  if(process.env.TANGYUANCL_EXTENSION_GUI){await call('Page.reload');await wait(2200)}
   const issues=[];const checkLayout=async name=>{
     const result=await evaluate('(()=>{const c=document.querySelector(".content");return {width:innerWidth,scroll:c.scrollWidth,client:c.clientWidth,over:[...c.querySelectorAll("button,input,select,h1,h3,.fm-row,.result-card")].filter(e=>e.getClientRects().length&&e.getBoundingClientRect().right>innerWidth+3).map(e=>e.className).slice(0,8)}})()');
     if(result.scroll>result.client+3||result.over.length)issues.push({name,...result});
@@ -118,7 +118,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   await main("globalThis.searchDelay=0;globalThis.searchFail=false;testElectron.ipcMain.removeHandler('community:search');testElectron.ipcMain.handle('community:search',async(_e,q)=>{await new Promise(r=>setTimeout(r,q.keyword==='slow'?700:searchDelay));if(searchFail||q.keyword==='failure')throw Error('验证：连接暂不可用');return {items:q.keyword==='empty'?[]:Array.from({length:8},(_,i)=>({projectId:'test'+i,source:'modrinth',title:(q.keyword||'模组资源')+' · 长名称资源 '+i,description:'用于检验布局与并发响应的隔离测试数据',downloads:4567,updatedAt:'2026-09-21',author:'布局测试',slug:'test',iconUrl:''})),total:q.keyword==='empty'?0:8,warnings:[]}})");
   // 1.1.2: installed entry ignores legacy download-tab preference; cached catalogs survive remounts.
   await main("globalThis.catalogCalls=0;globalThis.catalogDelay=0;testElectron.ipcMain.removeHandler('versions:catalog');testElectron.ipcMain.handle('versions:catalog',async()=>{catalogCalls++;await new Promise(r=>setTimeout(r,catalogDelay));return {versions:[{id:'26.3',type:'release',url:'https://example.test/26.3.json',releaseTime:'2026-09-15T11:23:00Z'}],checkedAt:Date.now(),stale:false}})");
-  await evaluate("localStorage.setItem('kamucl.gameTab','download')");await nav('game');
+  await evaluate("localStorage.setItem('tangyuancl.gameTab','download')");await nav('game');
   assert(await evaluate('document.querySelector("[data-tab=installed]").classList.contains("active")'),'entry should be installed');assert.equal(await main('catalogCalls'),0,'installed entry must not fetch remote metadata');
   await click('[data-tab=download]');await wait(250);assert.equal(await main('catalogCalls'),1);await nav('home');await nav('game');await click('[data-tab=download]');await wait(250);assert.equal(await main('catalogCalls'),1,'reuse catalog on revisit');
   await main('catalogDelay=800');await click('.tool-refresh');await wait(100);assert((await evaluate('document.querySelector(".latest-release").innerText')).includes('26.3'),'refresh keeps content');await wait(850);
@@ -200,8 +200,8 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   await evaluate('[...document.querySelectorAll(".settings-categories button")].find(e=>e.textContent==="外观").click()');await wait(100);await evaluate('document.querySelectorAll(".layout-setting").forEach(e=>e.open=true)');await wait(280);await evaluate('document.querySelector(".settings-body").scrollTop=300');const rememberedScroll=await evaluate('document.querySelector(".settings-body").scrollTop');assert(rememberedScroll>0);
   await evaluate('[...document.querySelectorAll(".settings-categories button")].find(e=>e.textContent==="下载").click()');await wait(100);await evaluate('[...document.querySelectorAll(".settings-categories button")].find(e=>e.textContent==="外观").click()');await wait(100);assert(Math.abs(await evaluate('document.querySelector(".settings-body").scrollTop')-rememberedScroll)<=2,'scroll restore within device-pixel rounding');
   assert.equal(issues.length,0,JSON.stringify(issues));
-  const result={version,complete:true,exeSHA256:process.env.KAMUCL_GUI_DEV?null:require('crypto').createHash('sha256').update(fs.readFileSync(exe)).digest('hex'),catalogReentry:true,disclosureBothDirections:true,dropdownMotion:true,methodEntryMotion:true,settingsScopes:true,compactRuntime:true,settingsScrollRestored:true,asyncLatestWins:true,errorRetry:true,emptySearch:true,modalKeyboard:true,runningState:true,confinedAnimation:true,root,shotDir,issues,settingsTargets:settingIds.length,reducedMotion:true,legacyConfig:true,rapidNavigation:true,themes:process.env.KAMUCL_TEST_THEME||'black-orange',windows:[[960,620,1],[1280,900,1.25],[1440,960,1.5],[980,720,1.5],'maximized']};fs.writeFileSync('out/ui-refinement-'+result.themes+'.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));
-  if(process.env.KAMUCL_UI_HOLD){fs.writeFileSync('out/ui-hold.ready','ready');while(!fs.existsSync('out/ui-hold.done'))await wait(500)}
+  const result={version,complete:true,exeSHA256:process.env.TANGYUANCL_GUI_DEV?null:require('crypto').createHash('sha256').update(fs.readFileSync(exe)).digest('hex'),catalogReentry:true,disclosureBothDirections:true,dropdownMotion:true,methodEntryMotion:true,settingsScopes:true,compactRuntime:true,settingsScrollRestored:true,asyncLatestWins:true,errorRetry:true,emptySearch:true,modalKeyboard:true,runningState:true,confinedAnimation:true,root,shotDir,issues,settingsTargets:settingIds.length,reducedMotion:true,legacyConfig:true,rapidNavigation:true,themes:process.env.TANGYUANCL_TEST_THEME||'black-orange',windows:[[960,620,1],[1280,900,1.25],[1440,960,1.5],[980,720,1.5],'maximized']};fs.writeFileSync('out/ui-refinement-'+result.themes+'.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));
+  if(process.env.TANGYUANCL_UI_HOLD){fs.writeFileSync('out/ui-hold.ready','ready');while(!fs.existsSync('out/ui-hold.done'))await wait(500)}
   await closeApp();
  }finally{if(mainWs?.readyState===WebSocket.OPEN)mainWs.close();if(ws?.readyState===WebSocket.OPEN){ws.send(JSON.stringify({id:999999,method:'Browser.close'}));await wait(1000);ws.close()}fs.closeSync(log)}
 })().catch(e=>{console.error(e);process.exitCode=1});

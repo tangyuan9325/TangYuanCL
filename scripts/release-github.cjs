@@ -14,7 +14,7 @@ const path = require('node:path')
 const crypto = require('node:crypto')
 const { execFileSync } = require('node:child_process')
 
-const REPO = 'kamubaba-i/KAMUCL'
+const REPO = 'kamubaba-i/TangYuanCL'
 const root = path.join(__dirname, '..')
 const pkg = require(path.join(root, 'package.json'))
 const version = pkg.version
@@ -33,7 +33,7 @@ function latestNoteBody() {
   new Function('module', 'exports', compiled)(notesModule, notesModule.exports)
   const note = notesModule.exports.updateNotes.find(n => n.version === version)
   if (!note?.changes?.length || !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(note.date)) throw new Error('当前版本缺少完整更新日志或分钟时间，停止发布')
-  return [`KAMUCL ${tag}`, note.date + '（UTC+8）', '', ...note.changes.map(i => `- ${i}`)].join('\n')
+  return [`TangYuanCL ${tag}`, note.date + '（UTC+8）', '', ...note.changes.map(i => `- ${i}`)].join('\n')
 }
 
 /** 从 git 凭据管理器取 GitHub 令牌（推送同款凭据） */
@@ -66,7 +66,7 @@ async function api(method, url, token, body, isBinary = false) {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/vnd.github+json',
-          'User-Agent': 'KAMUCL-Release-Script',
+          'User-Agent': 'TangYuanCL-Release-Script',
           ...(isBinary ? { 'Content-Type': 'application/octet-stream' } : body ? { 'Content-Type': 'application/json' } : {})
         },
         body: isBinary ? body : body ? JSON.stringify(body) : undefined
@@ -96,14 +96,14 @@ async function taggedCommit(token) {
 }
 
 async function main() {
-  const exe = path.join(root, 'release', `KAMUCL-${version}.exe`)
-  const zip = path.join(root, 'release', `KAMUCL-${version}-windows-x64.zip`)
-  const source = path.join(root, 'release', `KAMUCL-${version}-source.zip`)
-  const unpacked = path.join(root, 'release', `KAMUCL-${version}-windows-x64-unpacked.zip`)
-  const mac = ['arm64', 'x64'].flatMap(arch => ['dmg', 'zip'].map(ext => path.join(root, 'release', `KAMUCL-${version}-mac-${arch}.${ext}`)))
-  const handoff = path.join(root, 'release', `KAMUCL-${version}-handoff.zip`)
+  const exe = path.join(root, 'release', `TangYuanCL-${version}.exe`)
+  const zip = path.join(root, 'release', `TangYuanCL-${version}-windows-x64.zip`)
+  const source = path.join(root, 'release', `TangYuanCL-${version}-source.zip`)
+  const unpacked = path.join(root, 'release', `TangYuanCL-${version}-windows-x64-unpacked.zip`)
+  const mac = ['arm64', 'x64'].flatMap(arch => ['dmg', 'zip'].map(ext => path.join(root, 'release', `TangYuanCL-${version}-mac-${arch}.${ext}`)))
+  const handoff = path.join(root, 'release', `TangYuanCL-${version}-handoff.zip`)
   const packages = [exe, zip, unpacked, source, ...mac, handoff]
-  const history = path.join(root, 'release', `KAMUCL-${version}-validation-history.zip`)
+  const history = path.join(root, 'release', `TangYuanCL-${version}-validation-history.zip`)
   if (fs.existsSync(history)) packages.push(history)
   for (const f of packages) {
     if (!fs.existsSync(f)) {
@@ -140,7 +140,7 @@ async function main() {
   if (!masterResponse.ok || (await masterResponse.json()).commit?.sha !== commit) throw new Error('本地 HEAD 尚未同步到 origin/master，停止发布')
   const existingTag = await taggedCommit(token)
   if (existingTag && existingTag !== commit) throw new Error('版本标签已指向其他提交，保留远端标签并停止发布')
-  const binding = { tag_name: tag, target_commitish: commit, name: `KAMUCL ${tag}`, body, prerelease: false }
+  const binding = { tag_name: tag, target_commitish: commit, name: `TangYuanCL ${tag}`, body, prerelease: false }
 
   // 已存在同 tag Release 则复用（幂等）
   let release = null

@@ -1,4 +1,4 @@
-﻿# KAMUCL 功能审计报告
+﻿# TangYuanCL 功能审计报告
 
 > 审计时间：2026-09-03 ｜ 基线：PCL2 正式版 2.12.x + 社区版 CE
 > 状态档位：✅ 已实装且可用 ｜ 🟡 部分实现 ｜ 🔴 仅有入口 ｜ ⛔ 入口损坏 ｜ ⚪ 完全缺失
@@ -11,7 +11,7 @@
 | 构建 | `electron-vite build` 三目标打包；Windows 分发走 `electron-builder --win portable`；macOS 走自研 `scripts/pack-mac.mjs`（zip 层重写 .app、手工拼 icns、注入 asar，Windows 无 symlink 权限下可用） |
 | 模块划分 | 主进程 `src/main/core/`：accounts / versions / download / java / launch / loaders / modpacks / community / skins / settings / paths；`ipc.ts` 集中注册 34 个 invoke 通道 + 5 个事件通道；契约集中在 `src/shared/types.ts` |
 | 数据流 | 请求-响应 `ipcRenderer.invoke`；长任务 invoke 仅受理，进度 `event:progress`、结果 `event:installDone`/`event:launchState`、日志 `event:launchLog`、登录 `event:msLoginDone` 推送 |
-| 持久化 | userData：settings.json / accounts.json / skins.json+skins/*.png；游戏数据默认 `%AppData%\.kamucl`；localStorage 存最近游玩/上次版本/Banner 对齐 |
+| 持久化 | userData：settings.json / accounts.json / skins.json+skins/*.png；游戏数据默认 `%AppData%\.tangyuancl`；localStorage 存最近游玩/上次版本/Banner 对齐 |
 
 **版本标识不一致**：package.json 为 0.4.1，但 UI 与启动参数硬编码 0.1.0（App.vue:22、HomeView.vue:518、launch.ts:284）。
 
@@ -28,7 +28,7 @@
 | 启动 | 参数拼接/classpath/natives | launch.ts 全文 | ✅ | inheritsFrom 链合并、rules 官方语义、变量全表替换、natives 解压+classpath 双保险 |
 | 启动 | 启动自愈 | launch.ts:139-160 | ✅ | 链 json/client jar/依赖库缺失自动补下 |
 | 启动 | 启动后关闭启动器 | SettingsView.vue:312 | ✅ | 已于 0.4.2 实装（ipc.ts gameLaunch onState：running 后 1.5s 关窗；验证：开启开关后启动游戏，启动器自动关闭） | 启动后隐藏/关闭 |
-| 启动 | 日志实时查看 | HomeView.vue:344 | ✅ | 实时滚动 + 落盘 kamucl-logs/latest.log |
+| 启动 | 日志实时查看 | HomeView.vue:344 | ✅ | 实时滚动 + 落盘 tangyuancl-logs/latest.log |
 | 启动 | 日志导出 | — | ⚪ | 无导出/打开日志目录入口 | 日志导出 |
 
 ### 下载与版本管理（P1）

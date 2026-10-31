@@ -8,7 +8,7 @@ import { decideUpdateAction } from '../src/main/core/selfUpdate'
 import { getPendingUpdate, clearPendingUpdate } from '../src/main/core/applyUpdate'
 
 const read = (file: string) => fs.readFileSync(file, 'utf8')
-const rel = (version: string) => ({ version, publishedAt: '', body: '', assetUrl: 'u', assetSize: 1, assetName: `KAMUCL-${version}.exe` })
+const rel = (version: string) => ({ version, publishedAt: '', body: '', assetUrl: 'u', assetSize: 1, assetName: `TangYuanCL-${version}.exe` })
 
 test('auto update decision: silent download by default, prompt when disabled, none when redundant', () => {
   const base = { release: rel('1.0.15'), skipVersion: undefined, current: '1.0.14', autoUpdate: true as boolean, supported: true, downloading: false, pendingVersion: undefined as string | undefined }
@@ -32,12 +32,12 @@ test('auto update decision: silent download by default, prompt when disabled, no
 })
 
 test('pending update roundtrip: readable only while file exists, clear removes', () => {
-  const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'kamucl-pend-'))
-  process.env.KAMUCL_USERDATA_DIR = userData
-  process.env.KAMUCL_UPDATE_API_BASE = 'http://127.0.0.1:8310'
+  const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'tangyuancl-pend-'))
+  process.env.TANGYUANCL_USERDATA_DIR = userData
+  process.env.TANGYUANCL_UPDATE_API_BASE = 'http://127.0.0.1:8310'
   try {
     assert.equal(getPendingUpdate(), null, 'no pending initially')
-    const fakeExe = path.join(userData, 'KAMUCL-9.9.9.exe')
+    const fakeExe = path.join(userData, 'TangYuanCL-9.9.9.exe')
     fs.writeFileSync(fakeExe, 'fake')
     fs.writeFileSync(path.join(userData, 'pending-update.json'), JSON.stringify({ release: rel('9.9.9'), file: fakeExe }))
     const p = getPendingUpdate()
@@ -50,8 +50,8 @@ test('pending update roundtrip: readable only while file exists, clear removes',
     clearPendingUpdate()
     assert.equal(getPendingUpdate(), null)
   } finally {
-    delete process.env.KAMUCL_USERDATA_DIR
-    delete process.env.KAMUCL_UPDATE_API_BASE
+    delete process.env.TANGYUANCL_USERDATA_DIR
+    delete process.env.TANGYUANCL_UPDATE_API_BASE
   }
 })
 

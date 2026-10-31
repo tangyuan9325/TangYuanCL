@@ -28,7 +28,7 @@
 | 🔎 社区资源 | 搜索并导入 Modrinth / CurseForge 资源 |
 | 🧁 皮肤衣柜 | 角色预览、皮肤与披风上传、历史记录 |
 | 🤝 联机 | FRP、VoxLink、Terracotta 和好友直连 |
-| 🛠️ MOD 面板 | 通过 KAMUCL Bridge 实时读取与修改 MOD 参数 |
+| 🛠️ MOD 面板 | 通过 TangYuanCL Bridge 实时读取与修改 MOD 参数 |
 | ✨ 个性化 | 主题、背景、快捷键、插件和启动页缩略图 |
 | 🩺 诊断 | 下载任务、日志导出、启动诊断、更新与回滚 |
 
@@ -97,7 +97,7 @@ npx electron-builder --win portable
 
 代码协作采用 Fork、功能分支和 Pull Request。提交标题、正文、类型前缀与检查要求见[提交规范](docs/CONTRIBUTING.md)；开发检查清单见[开发指南](docs/DEVELOPMENT.md#9-提交前检查清单)。
 
-### 🌉 构建 KAMUCL Bridge（可选）
+### 🌉 构建 TangYuanCL Bridge（可选）
 
 Bridge 是给 Fabric 实例使用的本机桥接 MOD。需要 JDK 17+，并且本机已下载 Fabric Loader 与 Gson 依赖：
 
@@ -106,7 +106,7 @@ $env:JAVA_HOME = 'C:\Program Files\Java\jdk-17'
 node scripts/build-bridge.cjs
 ```
 
-成功后会生成 `bridge/dist/kamucl-bridge-1.0.0.jar`。构建脚本会从固定的 Fabric Maven 和 Maven Central 地址下载并校验编译依赖；未生成时主程序仍可构建，只是 Bridge 页面无法自动提供内置 MOD。
+成功后会生成 `bridge/dist/tangyuancl-bridge-1.0.0.jar`。构建脚本会从固定的 Fabric Maven 和 Maven Central 地址下载并校验编译依赖；未生成时主程序仍可构建，只是 Bridge 页面无法自动提供内置 MOD。
 
 ## 🗂️ 项目地图
 
@@ -115,7 +115,7 @@ src/main/       Electron 主进程、Minecraft 管理与 IPC
 src/preload/    渲染进程安全桥接 API
 src/renderer/   Vue 页面、组件与主题
 src/shared/     共用类型、协议和常量
-bridge/         KAMUCL Bridge MOD（Fabric）
+bridge/         TangYuanCL Bridge MOD（Fabric）
 native/         Windows 原生辅助程序（材质、聚焦、启动反馈）
 scripts/        构建、发布与回归测试脚本
 tests/          自动化测试

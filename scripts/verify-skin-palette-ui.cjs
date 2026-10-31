@@ -12,7 +12,7 @@ module.exports = async ({ evaluate, call, main, nav, wait, root, screenshot, ver
     while(Date.now()-started<preferenceReadiness.maximumMs){
       let timer
       const settings=await Promise.race([
-        evaluate("window.kamucl.invoke('settings:get')"),
+        evaluate("window.tangyuancl.invoke('settings:get')"),
         new Promise(resolve=>{timer=setTimeout(()=>resolve(null),Math.max(1,preferenceReadiness.maximumMs-(Date.now()-started)))})
       ]).finally(()=>clearTimeout(timer))
       if(!settings)break
@@ -82,13 +82,13 @@ module.exports = async ({ evaluate, call, main, nav, wait, root, screenshot, ver
   settings = await preferencesReady('picked alpha and recent colour persisted',p=>p.recent[0]==='#1177ee'&&p.alpha===128/255)
   await screenshot('skin-palette-117'); await edit('.palette-hex', '#124488'); await evaluate(`document.querySelector('[aria-label="关闭绘制皮肤"]').click()`)
   for(let i=0;i<30&&await evaluate('!!document.querySelector(".skin-editor")');i++)await wait(20)
-  settings=await evaluate("window.kamucl.invoke('settings:get')"); assert.equal(settings.skinEditorPalette.color,'#124488','immediate close flushes the latest colour')
+  settings=await evaluate("window.tangyuancl.invoke('settings:get')"); assert.equal(settings.skinEditorPalette.color,'#124488','immediate close flushes the latest colour')
   await button('绘制皮肤'); await wait(300)
   assert.equal(await hex(), '#124488'); assert(await evaluate(`!!document.querySelector('[aria-label="使用自定义颜色 #1177ee"]')`)); await layer('outer'); assert.equal(await field('.palette-alpha-number input'), '50.2')
   await evaluate(`document.querySelector('[aria-label="删除自定义颜色 #1177ee"]').click()`)
   assert(!await evaluate(`!!document.querySelector('[aria-label="使用自定义颜色 #1177ee"]')`),'custom colour is removed from the actual palette')
   settings = await preferencesReady('custom colour deletion persisted',p=>!p.custom.includes('#1177ee'))
   await edit('.palette-hex', '#d88c58'); await edit('.palette-alpha-number input', '100'); await evaluate(`document.querySelector('[aria-label="关闭绘制皮肤"]').click()`); await wait(500); await nav('home')
-  fs.writeFileSync('out/skin-palette-ui-'+(process.env.KAMUCL_TEST_THEME||'black-orange')+'.json', JSON.stringify({ version, synchronizedFields:true, invalidDrafts:true, noColourDirty:true, sameHalfTransparentPixelClean:true, textUndoPreserved:true, basePixels:inner, outerPixels:outer, outerRgba, pickedHex, pickAlpha:128/255, preferenceReadback:true, reopen:true, customDelete:true }, null, 2))
+  fs.writeFileSync('out/skin-palette-ui-'+(process.env.TANGYUANCL_TEST_THEME||'black-orange')+'.json', JSON.stringify({ version, synchronizedFields:true, invalidDrafts:true, noColourDirty:true, sameHalfTransparentPixelClean:true, textUndoPreserved:true, basePixels:inner, outerPixels:outer, outerRgba, pickedHex, pickAlpha:128/255, preferenceReadback:true, reopen:true, customDelete:true }, null, 2))
   console.log('PASS flexible palette, real PNG alpha, pick synchronization, text undo and persisted swatches')
 }

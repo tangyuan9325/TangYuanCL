@@ -144,6 +144,31 @@ const yggLogin = reactive({
   password: '',
   busy: false
 })
+
+// ---- 推荐的开源 Yggdrasil 登录服务（预配 API Root，点击即可探测） ----
+const KNOWN_PROVIDERS = [
+  {
+    name: 'Ely.by',
+    apiRoot: 'https://authserver.ely.by/api/authlib-injector',
+    license: 'GPL-3.0',
+    url: 'https://ely.by',
+    desc: '免费开源 Minecraft 认证与皮肤服务'
+  },
+  {
+    name: 'LittleSkin',
+    apiRoot: 'https://littleskin.cn/api/yggdrasil',
+    license: 'AGPL-3.0',
+    url: 'https://littleskin.cn',
+    desc: '国内主流开源 Yggdrasil 皮肤站'
+  },
+  {
+    name: 'Blessing Skin',
+    apiRoot: 'https://littleskin.cn/api/yggdrasil',
+    license: 'MIT',
+    url: 'https://github.com/bs-community/blessing-skin-server',
+    desc: '开源皮肤站服务端（自建可换地址）'
+  }
+] as const
 const profileModal = reactive({
   open: false,
   challengeId: '',
@@ -427,7 +452,7 @@ async function onRemove(acc: Account) {
       </div>
 
       <div v-if="accountMode === 'microsoft'" class="account-mode-panel">
-        <p class="muted mode-description">通过微软设备代码完成正版授权，KAMUCL 不会接触你的微软密码。</p>
+        <p class="muted mode-description">通过微软设备代码完成正版授权，TangYuanCL 不会接触你的微软密码。</p>
         <p class="muted">SSL 证书验证已启用：校验证书链、域名及有效期，证书异常时终止登录。</p>
         <button class="btn btn-gold ms-btn" :disabled="ms.starting" @click="beginMsLogin">
           <span v-if="ms.starting" class="spin"></span>
@@ -612,7 +637,17 @@ async function onRemove(acc: Account) {
       <div v-if="providerModal.open" class="modal-mask" @pointerdown.self="providerModal.open = false">
         <div class="modal provider-modal">
           <h3 class="modal-title">添加外置登录提供商</h3>
-          <p class="muted ms-tip">支持 API Root、authlib-injector 拖拽 URI，以及 KAMUCL 提供商 JSON/TXT 文件。</p>
+          <p class="muted ms-tip">支持 API Root、authlib-injector 拖拽 URI，以及 TangYuanCL 提供商 JSON/TXT 文件。</p>
+          <div class="known-providers">
+            <span class="known-label">推荐开源登录服务：</span>
+            <button
+              v-for="kp in KNOWN_PROVIDERS"
+              :key="kp.name"
+              class="known-chip"
+              :title="`${kp.desc}（${kp.license}）`"
+              @click="providerModal.source = kp.apiRoot; providerModal.candidate = null; providerModal.error = ''"
+            >{{ kp.name }}</button>
+          </div>
           <label class="provider-input-label">
             <span>API Root 或配置内容</span>
             <textarea
@@ -1017,6 +1052,32 @@ async function onRemove(acc: Account) {
   min-height: 84px;
   resize: vertical;
   font: var(--text-xs)/1.55 'Cascadia Code', Consolas, monospace;
+}
+.known-providers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.known-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+.known-chip {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full, 999px);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.known-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 .insecure-confirm {
   display: flex;

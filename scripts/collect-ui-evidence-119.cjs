@@ -2,10 +2,10 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto')
 const [theme,sinceText]=process.argv.slice(2),since=Date.parse(sinceText)
 assert(['black-orange','blue-white','custom'].includes(theme)&&Number.isFinite(since),'theme and ISO start time required')
-const version=require('../package.json').version,exe=path.resolve(`release/KAMUCL-${version}.exe`)
+const version=require('../package.json').version,exe=path.resolve(`release/TangYuanCL-${version}.exe`)
 assert.equal(version,'1.1.9')
 const sha=bytes=>crypto.createHash('sha256').update(bytes).digest('hex'),fresh=file=>fs.existsSync(file)&&fs.statSync(file).mtimeMs>=since
-const label=process.env.KAMUCL_EVIDENCE_LABEL||'Final-Windows'
+const label=process.env.TANGYUANCL_EVIDENCE_LABEL||'Final-Windows'
 assert(/^[A-Za-z0-9-]+$/.test(label),'evidence label must be a single directory component')
 const destination=path.resolve(`release/validation-${version}/${label}-${theme}`)
 assert(!fs.existsSync(destination),'Final evidence must not overwrite an earlier run')

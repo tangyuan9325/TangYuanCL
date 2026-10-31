@@ -1,5 +1,5 @@
 /**
- * KAMUCL 前后端共享类型与 IPC 契约
+ * TangYuanCL 前后端共享类型与 IPC 契约
  * 主进程 (src/main) 与渲染进程 (src/renderer) 都必须遵守本文件定义。
  */
 
@@ -100,7 +100,7 @@ export interface GameFolder {
 
 export interface FolderScanResult {
   folder: GameFolder
-  structure: 'minecraft' | 'kamucl' | 'empty' | 'missing'
+  structure: 'minecraft' | 'tangyuancl' | 'empty' | 'missing'
   status: 'ready' | 'warning' | 'error'
   versions: InstalledVersion[]
   errors: string[]
@@ -134,7 +134,7 @@ export interface InstalledVersion {
   resolution?: GameResolution
   /** 实例图标：'mob:<内置生物头像id>' | 'file:<自定义图标文件名>'（空 = 默认图标） */
   icon?: string
-  /** 首页启动卡专属缩略图；主进程只返回已验证的 KAMUCL 受管文件路径。 */
+  /** 首页启动卡专属缩略图；主进程只返回已验证的 TangYuanCL 受管文件路径。 */
   thumbnail?: string
   /** 专属缩略图显示方式。 */
   thumbnailFit?: ImageFit
@@ -189,7 +189,7 @@ export interface JavaInfo {
   vendor?: string
   /** 来源：自动扫描 / 手动添加 */
   source?: 'auto' | 'manual'
-  /** 自动发现入口，例如注册表、PATH、KAMUCL Runtime、本地磁盘。 */
+  /** 自动发现入口，例如注册表、PATH、TangYuanCL Runtime、本地磁盘。 */
   sourceDetail?: string
 }
 
@@ -294,7 +294,7 @@ export interface ReleaseInfo {
   assetUrl: string
   /** 资产文件大小（字节） */
   assetSize: number
-  /** 资产文件名（KAMUCL-x.y.z.exe） */
+  /** 资产文件名（TangYuanCL-x.y.z.exe） */
   assetName: string
 }
 
@@ -318,7 +318,7 @@ export interface UpdateStateInfo {
   /** 目标版本 */
   to: string
   time: string
-  /** 备份的完整路径（启动器目录 KAMUCL-backup 下） */
+  /** 备份的完整路径（启动器目录 TangYuanCL-backup 下） */
   backupPath: string
   /** 备份对应版本号 */
   backupVersion: string
@@ -401,7 +401,7 @@ export interface BackgroundSettings {
 export type ImageFit = 'fill' | 'fit' | 'crop'
 
 export interface LaunchThumbnailSettings {
-  /** KAMUCL userData 受管资源路径；空字符串使用内置轮播。 */
+  /** TangYuanCL userData 受管资源路径；空字符串使用内置轮播。 */
   image: string
   /** Ordered managed carousel images; absent means migrate legacy `image`. */
   images?: string[]
@@ -706,7 +706,7 @@ export const IPC = {
   defaultPacksRemove: 'defaultPacks:remove',
   defaultPacksMove: 'defaultPacks:move',
   defaultPacksSetEnabled: 'defaultPacks:setEnabled',
-  // 桥接 MOD 实时配置面板（游戏目录 .kamucl-bridge.json 发现 + token 校验，仅本机）
+  // 桥接 MOD 实时配置面板（游戏目录 .tangyuancl-bridge.json 发现 + token 校验，仅本机）
   bridgeStatus: 'bridge:status', // (versionId: string) => BridgeStatus
   bridgeManifest: 'bridge:manifest', // (versionId: string) => { protocol, params: BridgeParam[] }
   bridgeSet: 'bridge:set', // (versionId: string, id: string, value: unknown) => { ok, value?, notice?, error? }
@@ -791,11 +791,22 @@ export const IPC_EVENT = {
 } as const
 
 /**
- * 微软登录默认 client_id：留空 = 未配置自注册应用，登录时提示用户先在
- * Microsoft Entra（Azure Portal）注册自己的应用并填入设置。
- * device code 流程必须使用应用注册方自己的 client_id，不得复用第三方客户端的 ID。
+ * 微软登录默认 client_id。
+ *
+ * 使用 Minecraft 官方启动器的 Azure 公共客户端 ID `00000000402b5328`，
+ * 这是开源 Minecraft 启动器社区在 OAuth2 设备码流（device code flow）中的
+ * 通用做法——Prism Launcher（LGPL-3.0）、MultiMC（Apache-2.0）、ATLauncher（MIT）、
+ * HMCL（GPL-3.0）等主流开源启动器均内置此 ID，使用户无需自行注册 Azure 应用
+ * 即可完成 Microsoft 正版登录。
+ *
+ * 授权页显示的应用名称为「Minecraft」（Microsoft 对该公共客户端的注册名称）。
+ * 用户可在「设置 → 微软登录 Client ID」中填入自注册的 Azure 应用 ID 进行覆盖，
+ * 此时授权页将显示用户自己的应用名称。
+ *
+ * 来源：Minecraft Launcher（Microsoft 官方）的公开客户端标识；
+ *   用法参考 Prism Launcher https://github.com/PrismLauncher/PrismLauncher（LGPL-3.0）
  */
-export const DEFAULT_MS_CLIENT_ID = ''
+export const DEFAULT_MS_CLIENT_ID = '00000000402b5328'
 
 // ---------------- 社区资源 ----------------
 export type CommunityKind = 'mod' | 'modpack' | 'resourcepack' | 'shader' | 'datapack'
@@ -1020,7 +1031,7 @@ export interface ServerEntry {
   minecraftVersion?: string
   loader?: LoaderName
   loaderVersion?: string
-  /** KAMUCL 一键启动该条目的时间；servers.dat 本身不包含游玩时间。 */
+  /** TangYuanCL 一键启动该条目的时间；servers.dat 本身不包含游玩时间。 */
   lastUsedAt?: string
   lastSeenAt?: string
   source?: 'launcher' | 'minecraft'

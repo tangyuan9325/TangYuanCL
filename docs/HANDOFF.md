@@ -1,4 +1,4 @@
-# KAMUCL 项目交接文档（给 Codex）
+# TangYuanCL 项目交接文档（给 Codex）
 
 > 更新时间：2026-09-12 ｜ 文档状态：历史交接快照
 > 当前源码版本请以根目录 `package.json`、Git HEAD 和最新 Release 为准；本页首部以下的 1.0.59 内容为历史验证记录。
@@ -7,7 +7,7 @@
 
 ## 0. 必读：项目一句话
 
-KAMUCL 是卡慕SaMa 的 Minecraft 启动器：Electron 33+ + Vue 3（script setup）+ TypeScript。便携版单 exe 分发，GitHub Releases 自更新。当前由卡慕（产品/前端指令）+ 我（主线开发）+ 物晖（另一条开发线，今后**不再合并其分支**）协作。
+TangYuanCL 是卡慕SaMa 的 Minecraft 启动器：Electron 33+ + Vue 3（script setup）+ TypeScript。便携版单 exe 分发，GitHub Releases 自更新。当前由卡慕（产品/前端指令）+ 我（主线开发）+ 物晖（另一条开发线，今后**不再合并其分支**）协作。
 
 ---
 
@@ -24,15 +24,15 @@ KAMUCL 是卡慕SaMa 的 Minecraft 启动器：Electron 33+ + Vue 3（script set
 
 验证证据：386 项测试全部通过（`out/test-1058-final.log`），类型检查及构建通过。Windows `out/release-1.0.58-proof.json`；生产页面 `out/network-ui-UQmEwu`（包含截图原图、分页、另存为、长列表、弹窗和窄窗口）。Mac 原生工作流 https://github.com/kamubaba-i/KAMUCL/actions/runs/34585426458 两架构全部成功，下载后再次验证哈希；挂载 DMG 启动证据在 `out/1058-mac-arm64/mac-proof-arm64`、`out/1058-mac-x64/mac-proof-x64`。Mac 沿用 ad-hoc 签名，未做 Apple Developer ID 签名及公证。
 
-**v1.0.57 补充 DMG 应用安装镜像**：`KAMUCL-1.0.57-mac-arm64.dmg` 和 `KAMUCL-1.0.57-mac-x64.dmg` 已附加到相同 Release，内含 KAMUCL.app、Applications 快捷入口和安装说明。此次仅封装已发布 ZIP 中的相同应用，版本保持 1.0.57，原 ZIP/Windows 附件及标签不变。Mac 原生验证运行 https://github.com/kamubaba-i/KAMUCL/actions/runs/34575051141 ：ZIP 哈希、签名结构、hdiutil verify、只读挂载后的实际主界面启动全部通过。未做 Apple 开发者签名及公证。DMG 发布摘要独立放在 SHA256SUMS-DMG.txt，成品归档 `release/final-1.0.57`；证据 `out/dmg-arm64-ci`、`out/dmg-x64-ci`、`out/upload-dmg.log`。打包流程提交 master `9c25e07`、main `65ad879`。
+**v1.0.57 补充 DMG 应用安装镜像**：`TangYuanCL-1.0.57-mac-arm64.dmg` 和 `TangYuanCL-1.0.57-mac-x64.dmg` 已附加到相同 Release，内含 TangYuanCL.app、Applications 快捷入口和安装说明。此次仅封装已发布 ZIP 中的相同应用，版本保持 1.0.57，原 ZIP/Windows 附件及标签不变。Mac 原生验证运行 https://github.com/kamubaba-i/KAMUCL/actions/runs/34575051141 ：ZIP 哈希、签名结构、hdiutil verify、只读挂载后的实际主界面启动全部通过。未做 Apple 开发者签名及公证。DMG 发布摘要独立放在 SHA256SUMS-DMG.txt，成品归档 `release/final-1.0.57`；证据 `out/dmg-arm64-ci`、`out/dmg-x64-ci`、`out/upload-dmg.log`。打包流程提交 master `9c25e07`、main `65ad879`。
 
 ```text
-36081e0da4695ff304113e1e77fdfc9eb0086ddff4a0d5b2a7fa3f555616578e  KAMUCL-1.0.57-mac-arm64.dmg
-2afd01c6da2d5d5bb7cb8b05fe28eb419668ab8be951b21704a249442fc611e6  KAMUCL-1.0.57-mac-x64.dmg
+36081e0da4695ff304113e1e77fdfc9eb0086ddff4a0d5b2a7fa3f555616578e  TangYuanCL-1.0.57-mac-arm64.dmg
+2afd01c6da2d5d5bb7cb8b05fe28eb419668ab8be951b21704a249442fc611e6  TangYuanCL-1.0.57-mac-x64.dmg
 ```
 
 
-**1.0.57 已发布**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.57 ，Release ID 386823722。新增 mac-arm64 / mac-x64 ZIP（内含 KAMUCL.app），使用原生 GitHub macos-15 / macos-15-intel runner 构建和 ad-hoc 签名；未使用 Apple 开发者证书签名或公证，首次运行可能需要系统确认，Mac 更新手动下载对应架构 ZIP。Windows 成品同版本更新。
+**1.0.57 已发布**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.57 ，Release ID 386823722。新增 mac-arm64 / mac-x64 ZIP（内含 TangYuanCL.app），使用原生 GitHub macos-15 / macos-15-intel runner 构建和 ad-hoc 签名；未使用 Apple 开发者证书签名或公证，首次运行可能需要系统确认，Mac 更新手动下载对应架构 ZIP。Windows 成品同版本更新。
 
 构建/启动验证工作流 `.github/workflows/mac-build.yml`；成功运行 https://github.com/kamubaba-i/KAMUCL/actions/runs/34569450136 。实际打包主程序通过 CDP 验证首页与版本并截屏，二进制架构、ASAR 版本及依赖和归档 SHA256 通过；没有声称所有 Minecraft/第三方联机功能完成 Mac 实机验收。截图/证明 `out/mac-arm64-ci-final/mac-proof-arm64`、`out/mac-x64-ci-final/mac-proof-x64`。旧 `scripts/pack-mac.mjs` 不用于本版交付。
 
@@ -41,10 +41,10 @@ KAMUCL 是卡慕SaMa 的 Minecraft 启动器：Electron 33+ + Vue 3（script set
 源码提交 master `bf74ad9`、`c022373`、`b2cc4d6`（tag），main `0e1a9fb`、`a0f510b`、`b430482`。Mac 产物对应 c022373，后续 b2cc4d6 仅修改测试。发布附件五项全部核对大小与 SHA256、标签及 latest：`out/publish-1057.log`。完整成品归档 `release/final-1.0.57`。
 
 ```text
-08825ded2e2aa6bf1549dde0fc6ac735b3b46982f9d71669aa66132c6342bcdb  KAMUCL-1.0.57.exe
-f8dec7c7f2be9306ff92e8aebc1d774aa05fb461537b7fb47f68d3d869f2c632  KAMUCL-1.0.57-windows-x64.zip
-0e2705f73fb1e79d6d43c08c5f4c8b38b091d27450b0a413d9804d13fd9b8da4  KAMUCL-1.0.57-mac-arm64.zip
-efc5320db5aefcdbd2be306dc978c4e0ef1958a5b400661ed25a82c9e599d11f  KAMUCL-1.0.57-mac-x64.zip
+08825ded2e2aa6bf1549dde0fc6ac735b3b46982f9d71669aa66132c6342bcdb  TangYuanCL-1.0.57.exe
+f8dec7c7f2be9306ff92e8aebc1d774aa05fb461537b7fb47f68d3d869f2c632  TangYuanCL-1.0.57-windows-x64.zip
+0e2705f73fb1e79d6d43c08c5f4c8b38b091d27450b0a413d9804d13fd9b8da4  TangYuanCL-1.0.57-mac-arm64.zip
+efc5320db5aefcdbd2be306dc978c4e0ef1958a5b400661ed25a82c9e599d11f  TangYuanCL-1.0.57-mac-x64.zip
 ```
 
 
@@ -53,16 +53,16 @@ efc5320db5aefcdbd2be306dc978c4e0ef1958a5b400661ed25a82c9e599d11f  KAMUCL-1.0.57-
 TypeScript、生产构建、生产 renderer IPC 夹具交互验证通过（选择与 Esc、空重复项关闭、移除控件、浅色/橙黑主题菜单）。截图 `out/network-ui-gRTfKs`、`out/network-ui-qBkPMh`，日志 `out/ui-1056.log`、`out/ui-1056-dark.log`。EXE/ZIP 启动入口及 ASAR 一致性验证通过；成品 `release/final-1.0.56`，证据 `out/package-1056-final.log`、`out/release-1.0.56-proof.json`、`out/publish-1056.log`。附件 SHA256、远端标签和 latest 核对通过。
 
 ```text
-79b68b4c18e7d38e9e0991266fc966422c9ad2ff47008b933043dbd98dea6095  KAMUCL-1.0.56.exe
-82bc2f560264349d48d124df05e6bba19126b506f7a6c29f84004ca81408e35f  KAMUCL-1.0.56-windows-x64.zip
+79b68b4c18e7d38e9e0991266fc966422c9ad2ff47008b933043dbd98dea6095  TangYuanCL-1.0.56.exe
+82bc2f560264349d48d124df05e6bba19126b506f7a6c29f84004ca81408e35f  TangYuanCL-1.0.56-windows-x64.zip
 ```
 
 
 **1.0.55 已发布**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.55 ，Release ID 386776165。皮肤页说明简化为“支持 64×64 的 PNG 皮肤文件”。master 提交 `b36954b`，main cherry-pick `6f14d9e`。TypeScript、生产构建及 EXE/ZIP 启动入口验证通过，附件 SHA256 与远端核对通过。成品 `release/final-1.0.55`；证据 `out/build-1055.log`、`out/package-1055.log`、`out/release-1.0.55-proof.json`、`out/publish-1055.log`。
 
 ```text
-16e8a7e1bea7321b96dcf49bec691e4063d1208dbfda77f6b01cd5e49dd65e57  KAMUCL-1.0.55.exe
-b83c38ded255b02c132785cee93748992d3592ac87945278e39f35d913cd09ed  KAMUCL-1.0.55-windows-x64.zip
+16e8a7e1bea7321b96dcf49bec691e4063d1208dbfda77f6b01cd5e49dd65e57  TangYuanCL-1.0.55.exe
+b83c38ded255b02c132785cee93748992d3592ac87945278e39f35d913cd09ed  TangYuanCL-1.0.55-windows-x64.zip
 ```
 
 
@@ -77,8 +77,8 @@ b83c38ded255b02c132785cee93748992d3592ac87945278e39f35d913cd09ed  KAMUCL-1.0.55-
 **成品**：`release/final-1.0.54` 为已核验归档（本版与顶层 release 同字节）。EXE 中文/空格路径冷启动和缓存启动、ZIP 解压后 Electron 入口通过；144个打包源文件与最终构建一致，EXE/ZIP ASAR 相同。原生反馈首帧343/243ms，Electron入口6044/208ms（RunAsNode探针，非完整首页加载耗时）；日志 `out/startup-1.0.54.log`、`out/release-1.0.54-proof.json`、`out/package-1054-final.log`、`out/tests-all-1054-final.log`、`out/tsc-1054-final.log`。上传与附件/标签核对日志：`out/upload-1054.log`、`out/publish-1054.log`。未结束用户游戏/启动器进程，未触碰 wuhui。
 
 ```text
-e932191290fb074a3ae417e9bd536dd51433f4de10df22daf6cf360d3491733e  KAMUCL-1.0.54.exe
-703df39fec667011dd20d54cc8a017c8abd164b65700271738f6d5d2911a205f  KAMUCL-1.0.54-windows-x64.zip
+e932191290fb074a3ae417e9bd536dd51433f4de10df22daf6cf360d3491733e  TangYuanCL-1.0.54.exe
+703df39fec667011dd20d54cc8a017c8abd164b65700271738f6d5d2911a205f  TangYuanCL-1.0.54-windows-x64.zip
 ```
 
 ---
@@ -94,11 +94,11 @@ e932191290fb074a3ae417e9bd536dd51433f4de10df22daf6cf360d3491733e  KAMUCL-1.0.54.
 
 **验证**：364/364 tests、TypeScript、最终生产构建通过。自动测试覆盖降级、缺失确认、必要前置、禁用保留、源变化、网络失败、取消、哈希/协议/目标版本校验、长名称。生产renderer验证开关、图标与外置名称、缺失确认门禁及执行IPC；真实Fabric API 26.2→1.21.11来源/适配检查通过，使用隔离副本。测试中的完整安装为模拟，不声称已启动所有迁移后的真实游戏。日志 out/tests-all-1053-final.log、out/tsc-1053-final.log、out/ui-migration-1053-final.log、out/migration-live-1053.log；截图 out/network-ui-nF8EFe/mod-switch-and-update.png、out/network-ui-55Todt/migration-confirmation.png。
 
-**最终成品目录**：release/final-1.0.53。顶层release/KAMUCL-1.0.53.exe是补入长度修复前的中间包，因用户正在运行而被锁定，未结束用户进程；不能用作最终交付。独立目录EXE基于最终win-unpacked打包，ZIP为最终构建副本。两种包ASAR与最终构建一致，版本及后台worker已检查。正常压缩便携包在中文空格路径冷/缓存启动通过，原生反馈首帧340/234ms（ElectronRunAsNode探针，非完整首页时间），out/startup-1.0.53.log。
+**最终成品目录**：release/final-1.0.53。顶层release/TangYuanCL-1.0.53.exe是补入长度修复前的中间包，因用户正在运行而被锁定，未结束用户进程；不能用作最终交付。独立目录EXE基于最终win-unpacked打包，ZIP为最终构建副本。两种包ASAR与最终构建一致，版本及后台worker已检查。正常压缩便携包在中文空格路径冷/缓存启动通过，原生反馈首帧340/234ms（ElectronRunAsNode探针，非完整首页时间），out/startup-1.0.53.log。
 
 ```text
-96c0db173801ba8fc36af4136815f3d7d57c8fbb6b083f029f10a36ce34fe24c  KAMUCL-1.0.53.exe
-59d1bfb991d52cee349f5376658d588ce41f5ebb44a340b27e56c1c094d94a71  KAMUCL-1.0.53-windows-x64.zip
+96c0db173801ba8fc36af4136815f3d7d57c8fbb6b083f029f10a36ce34fe24c  TangYuanCL-1.0.53.exe
+59d1bfb991d52cee349f5376658d588ce41f5ebb44a340b27e56c1c094d94a71  TangYuanCL-1.0.53-windows-x64.zip
 ```
 
 
@@ -109,21 +109,21 @@ e932191290fb074a3ae417e9bd536dd51433f4de10df22daf6cf360d3491733e  KAMUCL-1.0.54.
 
 **外观实现**：Vite 编译模板注入 data-ui 稳定结构标识；运行时按页面/子页区分组件覆盖，侧栏/顶栏作为 global。支持拖拽、单角缩放与精确数值、8px 吸附及对齐辅助、颜色/透明度/圆角/模糊/字体/文字/显隐/顺序，撤销重做50步。浏览模式操作原界面，选取模式阻止业务按钮误触。隐藏组件在编辑时可见并可从图层恢复。入口：设置→个性化→打开外观工作台；Ctrl+Shift+E 保留恢复入口。
 
-**主题码**：KAMUCL2.gzip-base64 包含 visualDesign 全部页面、主题、旧首页布局、背景/横幅图片与轮播配置；图片 SHA256 校验后导入独立缓存，不改游戏/账户设置。旧 KAMUCL. 颜色码兼容。导出前等待布局保存队列。位置为 CSS 像素；相同窗口尺寸还原最一致，不承诺不同窗口/字体/未来结构升级后逐像素一致。外显文字覆盖直接文字层，不修改业务数据。动态列表同结构组件按出现序号标识，随列表内容变化保持槽位样式。
+**主题码**：TangYuanCL2.gzip-base64 包含 visualDesign 全部页面、主题、旧首页布局、背景/横幅图片与轮播配置；图片 SHA256 校验后导入独立缓存，不改游戏/账户设置。旧 TangYuanCL. 颜色码兼容。导出前等待布局保存队列。位置为 CSS 像素；相同窗口尺寸还原最一致，不承诺不同窗口/字体/未来结构升级后逐像素一致。外显文字覆盖直接文字层，不修改业务数据。动态列表同结构组件按出现序号标识，随列表内容变化保持槽位样式。
 
 **验证**：360/360 tests；tsc、生产构建、生产 renderer 的拖动/文字/宽度/撤销/重做/重进/隐藏恢复/首页和资源页双向实例同步；三类资源分页图标；主题完整往返、图片、保留游戏设置、ZIP身份与 pack.png；ASAR后台worker。日志 out/tests-all-1052.log、out/ui-editor-1052-final.log、out/ui-pack-icons-1052.log、out/theme-roundtrip-1052.log、out/packaged-worker-1052.log。ZIP、便携解压 ASAR 与最终构建一致。隔离便携冷/缓存启动首帧337/262ms（ElectronRunAsNode入口验证，非完整首页时间），out/startup-1.0.52.log。
 
 ```text
-720128046aa5633093470e7f68342243e77509ce5cc3cb0edbe9a2f56696e035  KAMUCL-1.0.52.exe
-5ee122ddb4fe8999594378fa713cda49f7e24dfc751c84d62a5e7cb4b919704b  KAMUCL-1.0.52-windows-x64.zip
+720128046aa5633093470e7f68342243e77509ce5cc3cb0edbe9a2f56696e035  TangYuanCL-1.0.52.exe
+5ee122ddb4fe8999594378fa713cda49f7e24dfc751c84d62a5e7cb4b919704b  TangYuanCL-1.0.52-windows-x64.zip
 ```
 
 
 **1.0.51 交付**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.51 ，Release ID386560537，latest已核对。EXE/ZIP/SHA256SUMS.txt远端大小与digest逐项通过后发布。release目录成品、ZIP ASAR、便携解压ASAR均等于最终构建。中文空格路径便携冷/缓存启动通过（首帧351/242ms，隔离ElectronRunAsNode验证，不是完整用户首页启动），out/startup-1.0.51.log。
 
 ```text
-194e1c7bc73bbad93567cf43de22bd6266786c2326ee96b003ac92109d16cc84  KAMUCL-1.0.51.exe
-4532ee74d19933ff1126c5e4025487dbaeb5484e5ecfbd0fbda55bd48c7d2a5f  KAMUCL-1.0.51-windows-x64.zip
+194e1c7bc73bbad93567cf43de22bd6266786c2326ee96b003ac92109d16cc84  TangYuanCL-1.0.51.exe
+4532ee74d19933ff1126c5e4025487dbaeb5484e5ecfbd0fbda55bd48c7d2a5f  TangYuanCL-1.0.51-windows-x64.zip
 ```
 
 **1.0.51 模组社区图标**：master `e764cea` / main `dc7386c`，tag指向master功能提交。FileManager 模组页每页最多100项，120ms防抖后发mods:icons，传当前folder、version、文件名；渲染不等待图标，切页/切实例/卸载废弃旧结果。资源包/光影页不查模组图标。32px图标支持禁用JAR，图片失败退回文件图标。
@@ -136,18 +136,18 @@ e932191290fb074a3ae417e9bd536dd51433f4de10df22daf6cf360d3491733e  KAMUCL-1.0.54.
 
 
 
-**1.0.50 交付**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.50 ，Release ID 386553343。release/KAMUCL-1.0.50.exe（67634926字节）、release/KAMUCL-1.0.50-windows-x64.zip（103225860字节）、SHA256SUMS.txt 已上传并按GitHub资产digest/大小逐项核对后公开为latest。最终ASAR等于生产构建，ZIP及便携解出ASAR相同。中文空格路径冷/缓存启动通过，冷首帧337ms、缓存首帧233ms；此验证使用隔离ElectronRunAsNode，不是完整用户配置首页启动。out/startup-1.0.50.log、out/publish-1.0.50.log。
+**1.0.50 交付**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.50 ，Release ID 386553343。release/TangYuanCL-1.0.50.exe（67634926字节）、release/TangYuanCL-1.0.50-windows-x64.zip（103225860字节）、SHA256SUMS.txt 已上传并按GitHub资产digest/大小逐项核对后公开为latest。最终ASAR等于生产构建，ZIP及便携解出ASAR相同。中文空格路径冷/缓存启动通过，冷首帧337ms、缓存首帧233ms；此验证使用隔离ElectronRunAsNode，不是完整用户配置首页启动。out/startup-1.0.50.log、out/publish-1.0.50.log。
 
 ```text
-0daf190b04530c96459e590eed35afa9916aeed6d931d474bdbef7d18222d363  KAMUCL-1.0.50.exe
-a2eaffe0f173a67ac885b4d00580ac69463618087123c499b917e236b5e4aa79  KAMUCL-1.0.50-windows-x64.zip
+0daf190b04530c96459e590eed35afa9916aeed6d931d474bdbef7d18222d363  TangYuanCL-1.0.50.exe
+a2eaffe0f173a67ac885b4d00580ac69463618087123c499b917e236b5e4aa79  TangYuanCL-1.0.50-windows-x64.zip
 ```
 
 **1.0.50 本批改动**：默认配置 keys 从资源子菜单移至侧栏一级，折叠资源管理后仍可访问，原页面与配置保留。功能提交 master `076fd60` / main `76b126a`，tag v1.0.50 指向 master 功能提交。
 
 **整合包下载**：模组 CDN 在镜像模式按 MCIM 官方文档转换 cdn.modrinth.com 和 edge/mediafilez.forgecdn.net 的文件路径（https://docs.mcimirror.top/），官方模式不转换；保留原源回退。Range 独立 HTTP/1.1 连接，避免多个 H2 流挤在单连接；可信哈希、已知长度 >=8MiB 四路，>=64MiB 最多八路，服从全局并发和限速。整合包大文件优先，并在仅剩一两项时显示真实文件名。
 
-**缓存与续传**：defaultFolderPath()/.kamucl/modpack-cache，以可信 SHA512/SHA1 的哈希生成缓存键；完成后独立复制到实例（非硬链接），重试校验缓存完整性。缓存位于实例回滚目录外，失败不会抹掉成功文件；.segments-cache 保存分段与大小/数量/哈希标识，取消或网络失败保留分段，重试从段内偏移继续，合并后完整哈希验证。无可信哈希的下载不进入共享内容缓存。缓存目前无自动容量清理。
+**缓存与续传**：defaultFolderPath()/.tangyuancl/modpack-cache，以可信 SHA512/SHA1 的哈希生成缓存键；完成后独立复制到实例（非硬链接），重试校验缓存完整性。缓存位于实例回滚目录外，失败不会抹掉成功文件；.segments-cache 保存分段与大小/数量/哈希标识，取消或网络失败保留分段，重试从段内偏移继续，合并后完整哈希验证。无可信哈希的下载不进入共享内容缓存。缓存目前无自动容量清理。
 
 **红框结论**：用户原ZIP只带 EuphoriaPatcher-1.10.0-r5.9-fabric.jar，未包含 Complementary 基础光影，overrides/shaderpacks 为空。因此游戏内 SHADER NOT FOUND 不是启动器漏解压；需按补丁要求添加 Complementary r5.9 原始光影到所选实例 shaderpacks。官方安装说明 https://www.euphoriapatches.com/how-to-install/ 。没有自动改用户游戏或把未列入清单的光影装入实例。
 
@@ -158,7 +158,7 @@ a2eaffe0f173a67ac885b4d00580ac69463618087123c499b917e236b5e4aa79  KAMUCL-1.0.50-
 
 **1.0.49 已发布**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.49 ，Release ID 386542085。功能提交 master `f8c2fb1` / main `4f489a3`；标签指向 master 功能提交。EXE、ZIP、SHA256SUMS.txt 已核对远端大小与 SHA256 后发布，latest=v1.0.49。
 
-**最终本地产物目录**：release/final-1.0.49。打包期间检测到 release/KAMUCL-1.0.49.exe 正在运行（缓存1.0.49-d90f5243f8bbb535，为补入Java安装器互斥前的中间包），旧EXE被占用；未结束该启动器或游戏进程，改在独立目录从最终win-unpacked生成便携EXE，ZIP为最终构建的副本。发布附件取独立目录，旧顶层EXE不得用作最终交付。
+**最终本地产物目录**：release/final-1.0.49。打包期间检测到 release/TangYuanCL-1.0.49.exe 正在运行（缓存1.0.49-d90f5243f8bbb535，为补入Java安装器互斥前的中间包），旧EXE被占用；未结束该启动器或游戏进程，改在独立目录从最终win-unpacked生成便携EXE，ZIP为最终构建的副本。发布附件取独立目录，旧顶层EXE不得用作最终交付。
 
 **整合包导入**：用户附件是外层 ZIP（PCL EXE、PCL 配置与 modpack.mrpack），旧代码只检查外层清单。现在在无已知外层清单/完整客户端结构时，识别唯一内嵌 mrpack，重用路径/数量/压缩比校验并保留外层文件名；多个内包或内包超过512MiB时明确提示手动选择。外层 EXE 不执行、不导入。
 
@@ -173,8 +173,8 @@ a2eaffe0f173a67ac885b4d00580ac69463618087123c499b917e236b5e4aa79  KAMUCL-1.0.50-
 **验证**：353/353测试、TypeScript和最终生产构建通过。真实本地HTTP涵盖分段、Range忽略/错误回退、完整哈希、取消一个文件写入者后另一个接续；两版本真实安装流水线并行、共享库仅请求一次、取消一方另一方完成、切换默认目录不串路径。生产renderer隔离IPC验证两个安装按钮均受理、进度23%/71%互不覆盖、取消一方另一方继续88%。out/tests-all-1049-final.log、out/ui-install-1049.log、out/network-ui-wV1aUa。成品ASAR与最终构建一致、ZIP匹配、便携中文空格路径冷/缓存启动通过；out/startup-1.0.49.log。
 
 ```text
-23dc5ecc425e62165cdf31ffa181a33b760cc6b7bbb7bc01d450e5067bb23ed8  KAMUCL-1.0.49.exe
-3584103b44020f245f51fe510f56b63870a30c06299cff83551f513256a285b2  KAMUCL-1.0.49-windows-x64.zip
+23dc5ecc425e62165cdf31ffa181a33b760cc6b7bbb7bc01d450e5067bb23ed8  TangYuanCL-1.0.49.exe
+3584103b44020f245f51fe510f56b63870a30c06299cff83551f513256a285b2  TangYuanCL-1.0.49-windows-x64.zip
 ```
 
 
@@ -188,8 +188,8 @@ a2eaffe0f173a67ac885b4d00580ac69463618087123c499b917e236b5e4aa79  KAMUCL-1.0.50-
 **验证**：7项启动测试、TypeScript、生产构建通过；启动预绘制测试覆盖异窗IPC、不重叠请求、失败、关闭期间晚完成、预算到期和清理。原生动画约59.99fps；统一启动验证汇聚+停留2736ms，仍为一个原生动画进程、一个主窗口；成品三次均保持隐藏到就绪且恢复后台节流。ZIP ASAR一致性通过，便携中文空格路径冷/缓存启动通过（首帧347/242ms，缓存未重复解压）。日志 out/tests-startup-1048.log、out/types-1.0.48.log、out/framerate-1.0.48.log、out/unified-1.0.48.log、out/startup-1.0.48.log。
 
 ```text
-6702f2945a295e9510d018e7b8d373b9c591131be0980689e5dc72bc19790af4  KAMUCL-1.0.48.exe
-d439503d6d7ccfdc9e4125babdd69ce56ccca07afa8e424b8c5bededacf93c4c  KAMUCL-1.0.48-windows-x64.zip
+6702f2945a295e9510d018e7b8d373b9c591131be0980689e5dc72bc19790af4  TangYuanCL-1.0.48.exe
+d439503d6d7ccfdc9e4125babdd69ce56ccca07afa8e424b8c5bededacf93c4c  TangYuanCL-1.0.48-windows-x64.zip
 ```
 
 **1.0.47 已发布**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.47 。master `5bd2e51` / main `5f8720f`；创作者卡片使用用户提供的完整文案，整卡打开既有 B 站空间，悬停浮现 BAI_ZHU、AeZz、物晖。生产UI悬停及链接、便携启动、附件摘要已验证。
@@ -198,8 +198,8 @@ d439503d6d7ccfdc9e4125babdd69ce56ccca07afa8e424b8c5bededacf93c4c  KAMUCL-1.0.48-
 **1.0.46 已发布**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.46 ，Release ID386487076。功能提交 master `62fba23` / main `fd98c2d`；标签 v1.0.46 指向 master 功能提交。EXE 67,631,370 字节、ZIP 103,222,824 字节；三个远端附件大小与 SHA256、源码标签验证后公开。
 
 ```text
-c552ac46212cf41b473742456609b6670477163998b7179c8c2458cbbebcae15  KAMUCL-1.0.46.exe
-fc874c4ca3a98c724aad9ec612c1f3b94a4472c57b35f82d8f6098fa81dedb7b  KAMUCL-1.0.46-windows-x64.zip
+c552ac46212cf41b473742456609b6670477163998b7179c8c2458cbbebcae15  TangYuanCL-1.0.46.exe
+fc874c4ca3a98c724aad9ec612c1f3b94a4472c57b35f82d8f6098fa81dedb7b  TangYuanCL-1.0.46-windows-x64.zip
 ```
 
 **资源页问题根因及修复**：FileManager 原本在模组页面始终挂载 DupCleanModal，其 onMounted 即调用同步解析目录内全部 JAR，即使弹窗未打开也会阻塞主进程；无版本仍会构造 versions/.json，且跨 IPC 丢失 folder 导致同名版本串目录。弹窗改为打开且存在版本才挂载；所有资源操作携带当前 folder+id，resourceDirectory 只读取当前版本 JSON、按 effectiveGameDir 解析目录，异步单层读取（不递归），页面每页100项，切换版本失效旧响应；JAR解析与哈希转 worker_threads。检查更新也复用 worker。空版本三页禁用按钮且不发文件扫描，错误显示友好引导。
@@ -218,8 +218,8 @@ fc874c4ca3a98c724aad9ec612c1f3b94a4472c57b35f82d8f6098fa81dedb7b  KAMUCL-1.0.46-
 **1.0.45 已发布**：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.45 ，Release ID386379123。功能提交 master `b6f5b41` / main `190e5a1`，标签 v1.0.45 指向 master 功能提交。三个附件大小、SHA256与源码标签核对后公开。校验值：
 
 ```text
-417ac2d3bc8fc5fee37834b848902592fa3e24bf1320a248f0805fc86200610c  KAMUCL-1.0.45.exe
-2260a4d21bfb0397baa8b9c3795b72d75d93649031ec11fd8ba747908f9b8901  KAMUCL-1.0.45-windows-x64.zip
+417ac2d3bc8fc5fee37834b848902592fa3e24bf1320a248f0805fc86200610c  TangYuanCL-1.0.45.exe
+2260a4d21bfb0397baa8b9c3795b72d75d93649031ec11fd8ba747908f9b8901  TangYuanCL-1.0.45-windows-x64.zip
 ```
 
 **1.0.45 更新弹窗 UI**：原更新与版本回退使用无背景的 menu-overlay 和普通透明 card（浅色62%、深色44%），导致后方设置与壁纸直接透字；另有更新成功 toast 与弹窗重复、群提示常驻、版本摘要重复标题和内容滚动层级混乱。新增 UpdateDialogShell，Teleport 到 body，独立实色 card-solid 表面、模糊遮罩、固定标题和底部操作，中间内容滚动。更新/下载/完成、回退及本地安装确认统一样式；去掉重复 toast、折叠备用下载说明，历史版本展示实际变更摘要及本地分钟时间。支持 Tab 焦点循环、Esc 按状态关闭、关闭后恢复焦点。
@@ -282,7 +282,7 @@ fc874c4ca3a98c724aad9ec612c1f3b94a4472c57b35f82d8f6098fa81dedb7b  KAMUCL-1.0.46-
 
 **1.0.31 本批修改**：两处 SkinViewer3D 共用取景半高从 18 调整到 20，默认人物缩小约 10%；键位捕获显示独立 X 清空为 key.keyboard.unknown（未指定），绕过全局鼠标捕获防止误录左键。默认配置新增材质包多文件拖入/选择、去重、优先级排序、移除和同步开关；导入即开启同步。材质包存储在 userData/default-resourcepacks；启动前复制到实际实例 resourcepacks，合并 options.txt 的启用/兼容确认列表，保留其他配置及原文件。移除配置后下次同步取消默认启用，已复制文件保留。
 
-**v99.0.0 原因及处置**：实查 `C:/Users/ROG/AppData/Roaming/kamucl/pending-update.json`，版本 99.0.0，地址 `http://127.0.0.1:8310/download/KAMUCL-99.0.0.exe`。这是 scripts/mock-update-server.cjs 的模拟更新残留，并非 GitHub 最新版本；已将该记录原地备份为 `.rejected-test-20260910-064701`，保留包文件。正式版禁用测试环境变量覆盖，更新来源须与官方仓库/版本/资产名一致；检查缓存同样验证来源，无效待装记录隔离。开发测试须同时指定独立用户数据目录与模拟 API。
+**v99.0.0 原因及处置**：实查 `C:/Users/ROG/AppData/Roaming/tangyuancl/pending-update.json`，版本 99.0.0，地址 `http://127.0.0.1:8310/download/TangYuanCL-99.0.0.exe`。这是 scripts/mock-update-server.cjs 的模拟更新残留，并非 GitHub 最新版本；已将该记录原地备份为 `.rejected-test-20260910-064701`，保留包文件。正式版禁用测试环境变量覆盖，更新来源须与官方仓库/版本/资产名一致；检查缓存同样验证来源，无效待装记录隔离。开发测试须同时指定独立用户数据目录与模拟 API。
 
 **1.0.31 多开修复**：后端原本已允许多会话，版本页被全局 launchState 禁用。现在按 folder+versionId 跟踪状态，只禁用本实例；IPC 状态事件带实例身份，最近游玩及退出同步使用事件自身目标，旧实例退出不覆盖其他实例状态/最近进程记录。未启动或终止用户游戏；并发状态和目录隔离以模拟会话验证。
 
@@ -362,7 +362,7 @@ node scripts/release-github.cjs
 | `scripts/desktop-regression.cjs` | QA 隔离环境（需已装 vanilla 26.2） |
 | `scripts/mock-update-server.cjs` | 自更新 mock（v99.0.0；`MOCK_ASSET_FILE=<真实exe>` 可做全链路实证） |
 
-**E2E 实证过的全链路**（方法可复用）：沙盒目录放便携 exe + env `KAMUCL_UPDATE_API_BASE=mock` → 启动 → CDP 检查/下载 → `window:close` 优雅关闭 → 看 `%APPDATA%\kamucl\updater-last.log` 与沙盒目录文件变迁。
+**E2E 实证过的全链路**（方法可复用）：沙盒目录放便携 exe + env `TANGYUANCL_UPDATE_API_BASE=mock` → 启动 → CDP 检查/下载 → `window:close` 优雅关闭 → 看 `%APPDATA%\tangyuancl\updater-last.log` 与沙盒目录文件变迁。
 
 ---
 
@@ -398,9 +398,9 @@ node scripts/release-github.cjs
 
 ## 5. 反馈闭环（内测群 → 腾讯文档 → AI）
 
-- 桌面 `KamuclHelper.exe`（已解压到 Desktop\KamuclHelper\）：菜单 3 拉取 Bug+需求 → `data\ai_feed\feed.json`
+- 桌面 `TangyuanclHelper.exe`（已解压到 Desktop\TangyuanclHelper\）：菜单 3 拉取 Bug+需求 → `data\ai_feed\feed.json`
 - **注意**：主工具在 GBK 控制台打印 ⚠ 会崩（合并步前），两个分表 bug_feed.json/req_feed_limited.json 已生成，手工合并成 feed.json 即可
-- 修完后 `KamuclMarkDone.exe --id BUG-3,BUG-5` 回写「修复完成，等待复测」
+- 修完后 `TangyuanclMarkDone.exe --id BUG-3,BUG-5` 回写「修复完成，等待复测」
 - 当前 feed 里的未修条目：BUG-4（1.12.2 按键同步=未支持数字键码）、BUG-7（启动器双击报错偶现）、BUG-8（服务器写入 servers.dat=**1.0.25 新增-1 已实现**）、BUG-10（CF 下载报错=**1.0.23/24 CF 官方通道已修**）；BUG-3/5/6/9 已修或已确认
 
 ---
@@ -418,9 +418,9 @@ node scripts/release-github.cjs
 
 ## 7. 交接时的环境注意
 
-- 本机有多台 KAMUCL 测试实例可能残留进程（electron/KAMUCL.exe），改代码前 `Get-Process electron,java,KAMUCL | Stop-Process -Force`
+- 本机有多台 TangYuanCL 测试实例可能残留进程（electron/TangYuanCL.exe），改代码前 `Get-Process electron,java,TangYuanCL | Stop-Process -Force`
 - GitHub 推送被本机网络间歇重置：多试几次或走代理/改 sslBackend
-- 用户在用的游戏目录：`D:\Snapshot 2.2.10\.minecraft`（14 个版本实例）；默认目录 `%APPDATA%\.kamucl`
+- 用户在用的游戏目录：`D:\Snapshot 2.2.10\.minecraft`（14 个版本实例）；默认目录 `%APPDATA%\.tangyuancl`
 - 用户正登录微软正版 KaMuaMua（皮肤页/首页 3D 预览有真实皮肤+披风数据）
 
 ---
@@ -437,7 +437,7 @@ node scripts/release-github.cjs
 **1.0.32 已交付**：源码 master cc1666d / main b131bd9，标签 v1.0.32 指向 cc1666d。Release：https://github.com/kamubaba-i/KAMUCL/releases/tag/v1.0.32 。便携 EXE 中文空格路径启动通过；ZIP 与最终 app.asar 一致，主进程构建文件与包内一致。发布前已核对远端三附件大小、SHA256 和标签，发布后经认证 API 确认 latest 为 v1.0.32，误发 v1.0.41 仍为草稿。匿名 API 二次核验返回 403，认证核验正常。EXE SHA256：4d67d20c5eb5f721807a5621bea9a990127e14df7ddff706cdc5a9e81b419bc0；ZIP SHA256：af14410d29f190b891ae36be9ee1ab12fe532b6227ef1a988303aebd3a1ad85b。
 
 
-**1.0.33 启动优化**：旧便携 NSIS 每次启动前解压、退出删除运行环境，导致无反馈数秒。现在 .onInit 先提取并启动小型 WinForms 粒子窗口（同一头像切片、透明且点击穿透、不抢焦点），Electron 粒子窗口显示后通过临时信号文件接替；父 wrapper 退出或超时也会关闭反馈窗口。运行环境存到 EXE 旁 KAMUCL-runtime/<version-buildhash>，哈希包含 main/preload/renderer 全部构建内容与锁文件；解压完成标记及核心文件存在时复用，命名互斥锁串行首次解压，不在退出时删除缓存，避免并发使用冲突。不同构建互不混用。
+**1.0.33 启动优化**：旧便携 NSIS 每次启动前解压、退出删除运行环境，导致无反馈数秒。现在 .onInit 先提取并启动小型 WinForms 粒子窗口（同一头像切片、透明且点击穿透、不抢焦点），Electron 粒子窗口显示后通过临时信号文件接替；父 wrapper 退出或超时也会关闭反馈窗口。运行环境存到 EXE 旁 TangYuanCL-runtime/<version-buildhash>，哈希包含 main/preload/renderer 全部构建内容与锁文件；解压完成标记及核心文件存在时复用，命名互斥锁串行首次解压，不在退出时删除缓存，避免并发使用冲突。不同构建互不混用。
 
 **1.0.33 日志时间**：当前日志精确到分钟；1.0.32 根据 GitHub published_at 2026-09-10T06:00:21Z 补为本地 2026-09-10 14:00。AGENTS.md 明确后续日志必须 YYYY-MM-DD HH:mm。
 

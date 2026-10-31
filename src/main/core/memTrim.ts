@@ -20,7 +20,7 @@ export const IDLE_TRIM_INTERVAL_MS = 15 * 60_000
 /** trim 后等待内核回收/统计稳定再读一次指标的间隔 */
 export const TRIM_SETTLE_MS = 800
 /** 主进程 → 渲染层瘦身广播通道（shared/types.ts 归他人维护，此处用局部常量） */
-export const MEM_TRIM_CHANNEL = 'kamucl:mem-trim'
+export const MEM_TRIM_CHANNEL = 'tangyuancl:mem-trim'
 
 // ---------------- 纯函数（可测） ----------------
 
@@ -111,8 +111,8 @@ async function trimSelfViaPowerShell(selfPid: number): Promise<boolean> {
   const { execFile } = await import('node:child_process')
   const script =
     "$s='[DllImport(\"psapi.dll\")] public static extern bool EmptyWorkingSet(IntPtr h);[DllImport(\"kernel32.dll\")] public static extern IntPtr GetCurrentProcess();';" +
-    "Add-Type -MemberDefinition $s -Name KamuclTrim -Namespace Win32 | Out-Null;" +
-    '[Win32.KamuclTrim]::EmptyWorkingSet([Win32.KamuclTrim]::GetCurrentProcess()) | Out-Null'
+    "Add-Type -MemberDefinition $s -Name TangyuanclTrim -Namespace Win32 | Out-Null;" +
+    '[Win32.TangyuanclTrim]::EmptyWorkingSet([Win32.TangyuanclTrim]::GetCurrentProcess()) | Out-Null'
   return new Promise((resolve) => {
     execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { windowsHide: true, timeout: 10_000 }, (error) => resolve(!error))
   })

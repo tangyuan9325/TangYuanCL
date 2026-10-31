@@ -69,7 +69,7 @@ export function parseOptiFineDownloadPath(html: string, fileName: string): strin
 }
 
 async function fetchText(url: string, signal?: AbortSignal): Promise<string> {
-  const res = await fetch(url, { signal, redirect: 'follow', headers: { 'User-Agent': 'KAMUCL-Launcher' } })
+  const res = await fetch(url, { signal, redirect: 'follow', headers: { 'User-Agent': 'TangYuanCL-Launcher' } })
   if (!res.ok) throw new Error(`OptiFine 站点响应 ${res.status}（${url}）`)
   return res.text()
 }
@@ -123,7 +123,7 @@ function ensureLauncherProfiles(target: string): void {
 
 /** 运行官方安装器：java -jar <jar> --install <游戏目录> */
 export function runOptiFineInstaller(javaPath: string, jar: string, target: string, emit: ProgressEmit, signal?: AbortSignal): Promise<void> {
-  return withFileJob(path.join(target, '.kamucl-installer'), signal, () =>
+  return withFileJob(path.join(target, '.tangyuancl-installer'), signal, () =>
     new Promise<void>((resolve, reject) => {
       ensureLauncherProfiles(target)
       optifineLog.info(`运行 OptiFine 安装器 ${path.basename(jar)}（目标 ${target}）`)
@@ -158,7 +158,7 @@ export function runOptiFineInstaller(javaPath: string, jar: string, target: stri
         signal?.removeEventListener('abort', onAbort)
         if (tail.trim()) allLines.push(tail)
         try {
-          const logDir = path.join(target, 'kamucl-logs')
+          const logDir = path.join(target, 'tangyuancl-logs')
           fs.mkdirSync(logDir, { recursive: true })
           fs.writeFileSync(path.join(logDir, 'installer.log'), allLines.join('\n') + `\n\n[退出码 ${code ?? '未知'}] ${args.join(' ')}\n`, 'utf-8')
         } catch {
@@ -170,7 +170,7 @@ export function runOptiFineInstaller(javaPath: string, jar: string, target: stri
         else {
           const last = allLines.slice(-30).join('\n')
           optifineLog.error(`安装器失败（退出码 ${code ?? '未知'}）`)
-          reject(new Error(`OptiFine 安装器退出码 ${code}（完整日志见 kamucl-logs/installer.log）\n${last}`))
+          reject(new Error(`OptiFine 安装器退出码 ${code}（完整日志见 tangyuancl-logs/installer.log）\n${last}`))
         }
       })
     })

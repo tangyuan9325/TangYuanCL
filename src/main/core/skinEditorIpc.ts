@@ -24,7 +24,7 @@ export function registerSkinEditorIpc(getWin: () => BrowserWindow | null) {
   ipcMain.handle('skin:editorUpload', async (_e, value: unknown, variant: unknown, accountId: unknown) => {
     if (!selectedAccount() || selectedAccount()?.id !== accountId) throw new Error('账号已变更，请重新确认上传账号')
     if (variant !== 'classic' && variant !== 'slim') throw new Error('无效的皮肤模型')
-    const bytes = png(value), dir = await fs.mkdtemp(path.join(os.tmpdir(), 'kamucl-skin-'))
+    const bytes = png(value), dir = await fs.mkdtemp(path.join(os.tmpdir(), 'tangyuancl-skin-'))
     const file = path.join(dir, 'skin.png')
     try { await fs.writeFile(file, bytes); return await uploadSkin(file, variant) }
     finally { await fs.rm(dir, { recursive: true, force: true }) }

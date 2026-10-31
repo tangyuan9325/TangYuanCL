@@ -15,7 +15,7 @@ watch([()=>props.mc,()=>props.loader,enabled,retry,()=>JSON.stringify(favorites.
   try{await loadFavorites(true);if(stale)return
     rows.value=favorites.value.map(favorite=>({favorite,files:[],selected:'',checked:false,error:favorite.source?'':'来源未关联，无法自动下载'}))
     if(!props.loader){error.value='请先选择模组加载器';return}
-    await Promise.all(rows.value.map(async row=>{if(!row.favorite.source||!row.favorite.projectId)return;try{const files=await window.kamucl.invoke('mods:favoriteVersions',row.favorite.source,row.favorite.projectId,props.mc,props.loader) as CommunityFile[];if(stale)return;row.files=files;row.selected=files.find(f=>f.releaseType==='release')?.fileId||files[0]?.fileId||'';row.checked=!!row.selected;row.error=files.length?'':'没有兼容的文件'}catch(e){if(!stale)row.error=errText(e)}}))
+    await Promise.all(rows.value.map(async row=>{if(!row.favorite.source||!row.favorite.projectId)return;try{const files=await window.tangyuancl.invoke('mods:favoriteVersions',row.favorite.source,row.favorite.projectId,props.mc,props.loader) as CommunityFile[];if(stale)return;row.files=files;row.selected=files.find(f=>f.releaseType==='release')?.fileId||files[0]?.fileId||'';row.checked=!!row.selected;row.error=files.length?'':'没有兼容的文件'}catch(e){if(!stale)row.error=errText(e)}}))
   }catch(e){if(!stale)error.value=errText(e)}finally{if(!stale){busy.value=false;update()}}
 },{immediate:true})
 </script>

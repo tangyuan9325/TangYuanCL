@@ -7,7 +7,7 @@ module.exports=async function(appPath,arch){
   const proof=path.resolve(`release/mac-proof-${arch}/extra`);fs.mkdirSync(proof,{recursive:true})
   const runtime=execFileSync('find',[path.join(os.homedir(),'Library/Caches/electron'),'-name',`electron-v33.4.11-darwin-${arch}.zip`,'-print','-quit'],{encoding:'utf8'}).trim()
   assert(runtime,'electron-builder runtime archive missing')
-  const runtimeDir=fs.mkdtempSync(path.join(os.tmpdir(),'kamucl-runtime-'))
+  const runtimeDir=fs.mkdtempSync(path.join(os.tmpdir(),'tangyuancl-runtime-'))
   execFileSync('/usr/bin/ditto',['-x','-k',runtime,runtimeDir])
   const electron=path.join(runtimeDir,'Electron.app/Contents/MacOS/Electron')
   const failures=[]

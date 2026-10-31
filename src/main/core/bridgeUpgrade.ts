@@ -10,7 +10,7 @@ import { externalGameUsesDirectory } from './gameDirectoryUse'
 const sha = (bytes: Buffer, algorithm = 'sha256') => crypto.createHash(algorithm).update(bytes).digest('hex')
 // Exact payload of our released 1.0.0, independent of ZIP timestamps/JAR manifest
 // build-JDK. Never replace a similarly named third-party or user-modified bridge.
-const OLD_PAYLOAD = '730041b722253efb70c4e29f33c7d4e954fc0228ba24168c61bce1c6ba51c442'
+const OLD_PAYLOAD = '51f7f2cff0066676ec99985c33500a6b0178edeb31dcc83741b36dc778cfe9bd'
 export function bridgePayload(bytes: Buffer): string {
   const hash = crypto.createHash('sha256')
   const entries = new AdmZip(bytes).getEntries().filter(e => !e.isDirectory && e.entryName !== 'META-INF/MANIFEST.MF')
@@ -18,7 +18,7 @@ export function bridgePayload(bytes: Buffer): string {
   const metadata = entries.find(e => e.entryName === 'fabric.mod.json')
   if (!metadata) return ''
   const info = JSON.parse(metadata.getData().toString('utf8'))
-  if (info.id !== 'kamucl-bridge' || info.version !== '1.0.0') return ''
+  if (info.id !== 'tangyuancl-bridge' || info.version !== '1.0.0') return ''
   for (const e of entries.sort((a, b) => a.entryName.localeCompare(b.entryName, 'en'))) {
     hash.update(e.entryName).update('\0').update(sha(e.getData())).update('\n')
   }
@@ -42,10 +42,10 @@ export async function upgradeInstalledBridge(gameDirectory: string, bundled: str
       if (await externalGameUsesDirectory(gameDirectory)) { messages.push('同目录游戏仍在运行，桥接退出修复将在全部退出后的下次启动应用'); continue }
       const next = await fs.promises.readFile(bundled)
       const metadata = JSON.parse(new AdmZip(next).readAsText('fabric.mod.json'))
-      if (metadata.id !== 'kamucl-bridge' || metadata.version !== '1.0.1') throw new Error('内置桥接修复文件版本不匹配')
+      if (metadata.id !== 'tangyuancl-bridge' || metadata.version !== '1.0.1') throw new Error('内置桥接修复文件版本不匹配')
       await protectModChange(dir, [name], '桥接退出占用修复前')
       if (await externalGameUsesDirectory(gameDirectory) || isModLocked(dir, oldSha1)) throw new Error('桥接修复前目录占用或锁定状态发生变化')
-      const temp = path.join(dir, '.kamucl-bridge-' + crypto.randomUUID() + '.tmp')
+      const temp = path.join(dir, '.tangyuancl-bridge-' + crypto.randomUUID() + '.tmp')
       try {
         await fs.promises.writeFile(temp, next, { flag: 'wx' })
         await fs.promises.chmod(temp, stat.mode)
