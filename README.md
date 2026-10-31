@@ -1,4 +1,3 @@
-
 # TangYuanCL
 
 ### ✦ 简约、开箱即用的 Minecraft Java 启动器 ✦
@@ -14,10 +13,8 @@
 <p>把账号、实例、模组和启动按钮，收进一个清爽的小窗口里。<br>
 愿每一次启动，都像打开一扇通往方块世界的传送门。</p>
 
-> **TangYuanCL 是 [KAMUCL](https://github.com/kamubaba-i/KAMUCL) 的修改版**，遵循 MIT 许可证。
-> 原作者版权声明与完整许可文本见 [LICENSE](LICENSE)，第三方组件见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
-
-</div>
+> **TangYuanCL 从 [KAMUCL](https://github.com/kamubaba-i/KAMUCL) 分支（fork）而来**，并遵循其 MIT 许可证继续开源。
+> KAMUCL 原作者的版权声明与完整许可文本完整保留于 [LICENSE](LICENSE)；本项目在分支之上的改动同样以 MIT 发布，详见 [NOTICE.md](NOTICE.md)，第三方组件见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 🌸 功能一览
 
@@ -161,7 +158,8 @@ docs/           功能说明、构建说明与版本验证记录
 
 ## 💌 许可证
 
-本项目基于 [MIT License](LICENSE) 开源。
+TangYuanCL 从 [KAMUCL](https://github.com/kamubaba-i/KAMUCL)（MIT）分支而来，并继续以 [MIT License](LICENSE) 开源。
+KAMUCL 原作者的版权声明按许可证要求完整保留；分支后的改动来源与版权划分见 [NOTICE.md](NOTICE.md)。
 
 <div align="center">
 
