@@ -339,12 +339,14 @@ function useProxy(): boolean {
   }
 }
 
-async function postForm(url: string, body: Record<string, string>): Promise<Record<string, unknown>> {
+async function postForm(url: string, body: Record<string, string>, externalSignal?: AbortSignal): Promise<Record<string, unknown>> {
+  const timeout = AbortSignal.timeout(30000)
+  const signal = externalSignal ? AbortSignal.any([timeout, externalSignal]) : timeout
   const res = await microsoftFetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams(body).toString(),
-    signal: AbortSignal.timeout(30000),
+    signal,
     useProxy: useProxy()
   })
   return (await res.json().catch(() => ({}))) as Record<string, unknown>
@@ -491,8 +493,107 @@ async function pollDeviceCode(
 }
 
 /**
+ * 授权码流程登录（官方 Minecraft 启动器方式）：
+ * 打开 BrowserWindow → 用户登录 → 拦截 oauth20_desktop.srf 重定向获取 code
+ * → 换取 token → 完成 XBL → XSTS → MC 链路。
+ *
+ * 使用 Minecraft 官方启动器的 client_id `00000000402b5328` 与旧版 login.live.com 端点，
+ * scope 为 `service::user.auth.xboxlive.com::MBI_SSL`（仅此 scope 兼容旧版端点）。
+ * 参考：Prism Launcher（LGPL-3.0）、MultiMC（Apache-2.0）。
+ */
+const LEGACY_CLIENT_ID = '00000000402b5328'
+const LEGACY_SCOPE = 'service::user.auth.xboxlive.com::MBI_SSL'
+const LEGACY_REDIRECT = 'https://login.live.com/oauth20_desktop.srf'
+const LEGACY_AUTHORIZE = 'https://login.live.com/oauth20_authorize.srf'
+const LEGACY_TOKEN = 'https://login.live.com/oauth20_token.srf'
+
+export async function beginMsAuthCode(
+  onDone: (account: Account | null, error?: string) => void
+): Promise<void> {
+  cancelMsLogin()
+  const clientId = (getSettings().msClientId || DEFAULT_MS_CLIENT_ID).trim()
+  const useLegacy = clientId.toLowerCase() === LEGACY_CLIENT_ID
+
+  // 构造授权 URL
+  const authUrl = useLegacy
+    ? `${LEGACY_AUTHORIZE}?client_id=${clientId}&redirect_uri=${encodeURIComponent(LEGACY_REDIRECT)}&response_type=code&scope=${encodeURIComponent(LEGACY_SCOPE)}`
+    : `${msAuthBase(clientId)}/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(LEGACY_REDIRECT)}&response_type=code&scope=${encodeURIComponent(MS_SCOPE)}`
+
+  const { BrowserWindow } = await import('electron')
+  const win = new BrowserWindow({
+    width: 520, height: 680,
+    title: 'Microsoft 登录',
+    autoHideMenuBar: true,
+    webPreferences: { nodeIntegration: false, contextIsolation: true }
+  })
+
+  pollAbort = new AbortController()
+  const signal = pollAbort.signal
+
+  const cleanup = (): void => {
+    if (!win.isDestroyed()) win.destroy()
+    signal.removeEventListener('abort', onAbort)
+  }
+  const onAbort = (): void => cleanup()
+  signal.addEventListener('abort', onAbort, { once: true })
+
+  const fail = (message: string): void => {
+    authLog.error('微软登录失败', message)
+    cleanup()
+    onDone(null, message)
+  }
+
+  // 拦截导航：检测重定向到 oauth20_desktop.srf 时提取 code
+  const onNav = (event: Electron.Event, url: string): void => {
+    if (!url.startsWith(LEGACY_REDIRECT)) return
+    event.preventDefault()
+    const code = new URL(url).searchParams.get('code')
+    if (!code) {
+      fail('登录回调缺少授权码，请重试')
+      return
+    }
+    cleanup()
+    void exchangeCode(clientId, code, useLegacy, signal).then((account) => onDone(account)).catch((e) => {
+      const msg = e instanceof Error ? e.message : String(e)
+      if (!signal.aborted) authLog.error('微软登录失败', e)
+      onDone(null, signal.aborted ? undefined : msg)
+    })
+  }
+  win.webContents.on('will-navigate', onNav)
+  win.webContents.on('will-redirect', (event, url) => {
+    // 某些情况下走 redirect 而非 navigate
+    if (url.startsWith(LEGACY_REDIRECT)) onNav(event, url)
+  })
+
+  void win.loadURL(authUrl).catch((e) => fail(`无法打开登录页面：${e instanceof Error ? e.message : String(e)}`))
+}
+
+/** 用授权码换取 token 并完成 XBL→XSTS→MC 链 */
+async function exchangeCode(
+  clientId: string,
+  code: string,
+  useLegacy: boolean,
+  signal: AbortSignal
+): Promise<Account> {
+  const tokenUrl = useLegacy ? LEGACY_TOKEN : `${msAuthBase(clientId)}/token`
+  const body = useLegacy
+    ? { client_id: clientId, scope: LEGACY_SCOPE, code, redirect_uri: LEGACY_REDIRECT, grant_type: 'authorization_code' }
+    : { client_id: clientId, scope: MS_SCOPE, code, redirect_uri: LEGACY_REDIRECT, grant_type: 'authorization_code' }
+  const t = await postForm(tokenUrl, body, signal)
+  if (typeof t.access_token !== 'string') {
+    throw new Error((t.error_description as string | undefined) ?? '授权码换取令牌失败')
+  }
+  return await completeMsLogin(
+    t.access_token,
+    (t.refresh_token as string | undefined) ?? '',
+    (t.expires_in as number | undefined) ?? 86400
+  )
+}
+
+/**
  * 开始 device code 登录：返回展示信息给前端，后台轮询，
  * 完成后调用 onDone(account)；失败时 onDone(null, 具体原因)；用户取消时 onDone(null)。
+ * 仅在用户配置了自注册 Azure 应用 client_id 时使用。
  */
 export async function beginMsDeviceCode(
   onDone: (account: Account | null, error?: string) => void
@@ -543,12 +644,18 @@ export function cancelMsLogin(): void {
 export async function refreshMicrosoft(account: Account): Promise<Account> {
   if (!account.refreshToken) throw new Error('缺少 refresh_token，请重新登录')
   const clientId = requireMsClientId()
-  const t = await postForm(`${msAuthBase(clientId)}/token`, {
-    client_id: clientId,
-    grant_type: 'refresh_token',
-    refresh_token: account.refreshToken,
-    scope: MS_SCOPE
-  })
+  // 依次尝试旧版（login.live.com）与 v2.0（login.microsoftonline.com）刷新端点
+  const endpoints = [
+    { url: LEGACY_TOKEN, body: { client_id: clientId, scope: LEGACY_SCOPE, grant_type: 'refresh_token', refresh_token: account.refreshToken } },
+    { url: `${msAuthBase(clientId)}/token`, body: { client_id: clientId, scope: MS_SCOPE, grant_type: 'refresh_token', refresh_token: account.refreshToken } }
+  ]
+  let t: Record<string, unknown> = {}
+  for (const ep of endpoints) {
+    try {
+      t = await postForm(ep.url, ep.body)
+      if (typeof t.access_token === 'string') break
+    } catch { /* 尝试下一个端点 */ }
+  }
   if (typeof t.access_token !== 'string') {
     throw new Error((t.error_description as string | undefined) ?? '微软令牌刷新失败，请重新登录')
   }

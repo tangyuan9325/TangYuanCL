@@ -109,7 +109,7 @@ export const addOfflineAccount = (username: string) => invoke<Account>(IPC.accou
 export const removeAccount = (id: string) => invoke<Account[]>(IPC.accountsRemove, id)
 export const selectAccount = (id: string) => invoke<Account | null>(IPC.accountsSelect, id)
 export const getSelectedAccount = () => invoke<Account | null>(IPC.accountsSelected)
-export const msBeginLogin = () => invoke<MsDeviceCodeInfo>(IPC.accountsMsBegin)
+export const msBeginLogin = () => invoke<MsDeviceCodeInfo | undefined>(IPC.accountsMsBegin)
 export const msCancelLogin = () => invoke<void>(IPC.accountsMsCancel)
 export const listYggdrasilProviders = () =>
   invoke<YggdrasilProvider[]>(IPC.accountsYggProviders)

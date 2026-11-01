@@ -301,7 +301,7 @@ export function registerIpc(getWin: () => BrowserWindow | null): void {
   ipcMain.handle(IPC.accountsSelect, (_e, id: string) => accounts.selectAccount(id))
   ipcMain.handle(IPC.accountsSelected, () => accounts.selectedAccountPublic())
   ipcMain.handle(IPC.accountsMsBegin, () =>
-    accounts.beginMsDeviceCode((account, error) =>
+    accounts.beginMsAuthCode((account, error) =>
       send(IPC_EVENT.msLoginDone, account ? { account: accounts.publicAccount(account) } : { account: null, error: error ?? null })
     )
   )

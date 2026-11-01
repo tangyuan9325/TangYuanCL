@@ -6,7 +6,7 @@ import { checkServerIdentity } from 'node:tls'
 import { execFileSync } from 'node:child_process'
 
 const MICROSOFT_HOSTS = new Set([
-  'login.microsoftonline.com', 'user.auth.xboxlive.com',
+  'login.live.com', 'login.microsoftonline.com', 'user.auth.xboxlive.com',
   'xsts.auth.xboxlive.com', 'api.minecraftservices.com'
 ])
 

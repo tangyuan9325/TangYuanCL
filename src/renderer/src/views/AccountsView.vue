@@ -69,7 +69,7 @@ const ms = reactive({
   waiting: false,
   starting: false,
   autoCopied: false,
-  info: null as MsDeviceCodeInfo | null
+  info: null as MsDeviceCodeInfo | null | undefined
 })
 
 async function beginMsLogin() {
@@ -79,17 +79,21 @@ async function beginMsLogin() {
     ms.info = await msBeginLogin()
     ms.open = true
     ms.waiting = true
-    // 设备代码出现的瞬间自动写入剪贴板，玩家到验证页直接粘贴即可
-    ms.autoCopied = false
-    if (ms.info.userCode) {
+    if (ms.info && 'userCode' in ms.info && ms.info.userCode) {
+      // 设备代码流程：自动复制验证码并打开验证页
       ms.autoCopied = await copyText(ms.info.userCode)
-    }
-    // 自动拉起系统默认浏览器到验证页，无需再手动复制网址
-    if (ms.info.verificationUri) {
-      const opened = await openVerifyPage()
-      if (opened) toast('已打开验证页面，粘贴验证码完成授权', 'success')
+      if (ms.info.verificationUri) {
+        const opened = await openVerifyPage()
+        if (opened) toast('已打开验证页面，粘贴验证码完成授权', 'success')
+      }
+    } else {
+      // 授权码流程：浏览器窗口已打开，等待用户完成登录
+      ms.autoCopied = false
+      toast('请在弹出的登录窗口中完成 Microsoft 账户授权', 'success')
     }
   } catch (e) {
+    ms.open = false
+    ms.waiting = false
     toast('无法开始微软登录：' + errText(e), 'error')
   } finally {
     ms.starting = false
@@ -604,28 +608,43 @@ async function onRemove(acc: Account) {
       <div v-if="ms.open" class="modal-mask">
         <div class="modal ms-modal">
           <h3 class="modal-title">微软账号登录</h3>
-          <p class="muted ms-tip">
-            请在浏览器中打开验证地址，输入下方代码完成授权。登录成功后本窗口会自动关闭。
-          </p>
 
-          <button class="user-code" title="点击复制" @click="copyCode">
-            {{ ms.info?.userCode }}
-          </button>
-          <p v-if="ms.autoCopied" class="copy-hint copied">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-            已自动复制到剪贴板，到验证页直接粘贴即可
-          </p>
-          <p v-else class="muted copy-hint">点击代码即可复制</p>
+          <!-- 授权码流程：浏览器窗口已打开 -->
+          <template v-if="!ms.info?.userCode">
+            <p class="muted ms-tip">
+              已在弹出窗口中打开 Microsoft 登录页面。请在该窗口中完成登录与授权，
+              成功后本窗口会自动关闭。
+            </p>
+            <div v-if="ms.waiting" class="ms-waiting">
+              <span class="spin"></span>
+              <span class="muted">正在等待登录窗口完成授权…</span>
+            </div>
+          </template>
 
-          <div class="ms-uri-row">
-            <input class="input" :value="ms.info?.verificationUri" readonly />
-            <button class="btn btn-gold" @click="openVerifyPage">打开验证页面</button>
-          </div>
+          <!-- 设备码流程：显示验证码 -->
+          <template v-else>
+            <p class="muted ms-tip">
+              请在浏览器中打开验证地址，输入下方代码完成授权。登录成功后本窗口会自动关闭。
+            </p>
+            <button class="user-code" title="点击复制" @click="copyCode">
+              {{ ms.info?.userCode }}
+            </button>
+            <p v-if="ms.autoCopied" class="copy-hint copied">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+              已自动复制到剪贴板，到验证页直接粘贴即可
+            </p>
+            <p v-else class="muted copy-hint">点击代码即可复制</p>
 
-          <div v-if="ms.waiting" class="ms-waiting">
-            <span class="spin"></span>
-            <span class="muted">正在等待授权完成…</span>
-          </div>
+            <div class="ms-uri-row">
+              <input class="input" :value="ms.info?.verificationUri" readonly />
+              <button class="btn btn-gold" @click="openVerifyPage">打开验证页面</button>
+            </div>
+
+            <div v-if="ms.waiting" class="ms-waiting">
+              <span class="spin"></span>
+              <span class="muted">正在等待授权完成…</span>
+            </div>
+          </template>
 
           <div class="modal-actions">
             <button class="btn btn-ghost" @click="cancelMsLogin">取消登录</button>
